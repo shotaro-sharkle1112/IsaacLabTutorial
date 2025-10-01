@@ -40,10 +40,8 @@ LIMO_CFG = ArticulationCfg(
     actuators={
         "wheel_acts" : ImplicitActuatorCfg(
            joint_names_expr = [_FL,_FR,_RL,_RR],
-           effort_limit_sim = 500.0,
-           velocity_limit_sim=500.0,
-           stiffness=0.0,
-           damping=1000.0,
+           stiffness=None,
+           damping=None
         )
     },
 )
