@@ -83,7 +83,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     steps = 0
     episodes = 0
     location = 0
-    goal = torch.tensor([0.0, 0.0, 0.0])
+    goal = torch.tensor([0.0, 0.0, 0.0],device=scene.device)
     initial_distance = 2.0
     steps_threshold = 300
     dist_threshold = 0.2
