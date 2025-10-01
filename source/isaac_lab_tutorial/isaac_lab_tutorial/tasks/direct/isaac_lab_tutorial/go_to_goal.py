@@ -85,7 +85,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     location = 0
     goal = torch.tensor([0.0, 0.0, 0.0],device=scene.device)
     initial_distance = 2.0
-    steps_threshold = 300
+    steps_threshold = 1000
     dist_threshold = 0.2
 
     # goal consists of [target_pos(3), target_ang(1)]
@@ -101,7 +101,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
                 initial_distance*math.sin(goal_direction)
                 ],device=scene.device)
             # ゴールが
-            goal = torch.tensor([3.0, 0.0, 0.0],device=scene.device)
+            goal = torch.tensor([1.0, 0.0, 0.0],device=scene.device)
             # ゴールの配置
             root_goal_state = scene["Goal"].data.default_root_state.clone()
             root_goal_state[0, :3] = goal[:3]
@@ -131,7 +131,6 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
 
         elif learning_state == 1: # select action
             torque = torch.tensor([[0.0,0.0]])
-            print("[INFO]: Select a action...")
 
             # TODO: 環境情報の取得から
             # get env information
