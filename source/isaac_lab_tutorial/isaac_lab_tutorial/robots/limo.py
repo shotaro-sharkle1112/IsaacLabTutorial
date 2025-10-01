@@ -14,7 +14,7 @@ _RL = "rear_left_wheel"
 _RR = "rear_right_wheel"
 
 LIMO_CFG = ArticulationCfg(
-    prim_path="/World/envs/env_.*/Limo",  # envクローン対応
+    prim_path="/World/envs/env_.*/robot",  # envクローン対応
     spawn=sim_utils.UsdFileCfg(
         usd_path=_LIMO_USD,
     ),
