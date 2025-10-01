@@ -10,7 +10,7 @@ import math
 import random
 from isaaclab.app import AppLauncher
 
-from isaac_lab_tutorial.robots.jetbot import JETBOT_CONFIG
+
 
 # add argparse arguments
 parser = argparse.ArgumentParser(
@@ -30,6 +30,7 @@ import torch
 import isaaclab.sim as sim_utils
 from isaaclab.assets import AssetBaseCfg, ArticulationCfg, RigidObjectCfg
 from isaaclab.scene import InteractiveScene, InteractiveSceneCfg
+from isaac_lab_tutorial.robots.jetbot import JETBOT_CONFIG
 
 # TODO: それぞれのinteractivesceneにデータを格納できるかを調べる
 class JetbotSceneCfg(InteractiveSceneCfg):
