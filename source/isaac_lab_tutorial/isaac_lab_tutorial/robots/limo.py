@@ -17,31 +17,6 @@ LIMO_CFG = ArticulationCfg(
     prim_path="/World/envs/env_.*/Limo",  # envクローン対応
     spawn=sim_utils.UsdFileCfg(
         usd_path=_LIMO_USD,
-        rigid_props=sim_utils.RigidBodyPropertiesCfg(
-            rigid_body_enabled=True,
-            max_linear_velocity=1000.0,
-            max_angular_velocity=1000.0,
-            max_depenetration_velocity=100.0,
-            enable_gyroscopic_forces=True,
-        ),
-        articulation_props=sim_utils.ArticulationRootPropertiesCfg(
-            enabled_self_collisions=False,
-            solver_position_iteration_count=4,
-            solver_velocity_iteration_count=0,
-            sleep_threshold=0.005,
-            stabilization_threshold=0.001,
-        ),
     ),
-    init_state=ArticulationCfg.InitialStateCfg(
-        pos=(0.0, 0.0, 0.0),
-        # yaw は env 側で設定。車輪は0初期化。
-        joint_pos={_FL: 0.0, _FR: 0.0, _RL: 0.0, _RR: 0.0},
-    ),
-    actuators={
-        "wheel_acts" : ImplicitActuatorCfg(
-           joint_names_expr = [_FL,_FR,_RL,_RR],
-           stiffness=None,
-           damping=None
-        )
-    },
+    actuators={"wheel_acts": ImplicitActuatorCfg(joint_names_expr=[".*"], damping=None, stiffness=None)},
 )
