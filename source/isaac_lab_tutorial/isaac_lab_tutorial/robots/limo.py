@@ -20,3 +20,16 @@ LIMO_CFG = ArticulationCfg(
     ),
     actuators={"wheel_acts": ImplicitActuatorCfg(joint_names_expr=[".*"], damping=None, stiffness=None)},
 )
+
+LIMO_FRONT_CFG = ArticulationCfg(
+    prim_path="/World/envs/env_.*/robot",
+    spawn=sim_utils.UsdFileCfg(
+        usd_path=_LIMO_USD,
+    ),
+    actuators={
+        # 前輪のみを制御対象に。ここに並べた順番がアクションの次元順になる想定（FL→FR）
+        "front_wheels": ImplicitActuatorCfg(
+            joint_names_expr=[_FL, _FR],
+        ),
+    },
+)
