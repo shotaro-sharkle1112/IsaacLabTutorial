@@ -46,6 +46,14 @@ class IsaacLabTutorialEnv(DirectRLEnv):
         self.dof_idx, _ = self.robot.find_joints(self.cfg.dof_names)
 
     def _setup_scene(self):
+        ids, names = self.robot.find_joints(".*")
+        print("All joints:", names)
+
+        # どのDOFが“駆動対象”になっているかを確認
+        for attr in ["actuated_dof_indices", "driven_dof_indices", "actuated_joint_ids"]:
+            if hasattr(self.robot, attr):
+                idx = getattr(self.robot, attr)
+                print(attr, [names[i] for i in idx])
         self.robot = Articulation(self.cfg.robot_cfg)
         # add ground plane
         spawn_ground_plane(prim_path="/World/ground", cfg=GroundPlaneCfg())
