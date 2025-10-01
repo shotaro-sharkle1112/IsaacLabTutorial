@@ -30,6 +30,7 @@ LIMO_FRONT_CFG = ArticulationCfg(
         # 前輪のみを制御対象に。ここに並べた順番がアクションの次元順になる想定（FL→FR）
         "front_wheels": ImplicitActuatorCfg(
             joint_names_expr=[_FL, _FR],
+            damping=None, stiffness=None
         ),
     },
 )
