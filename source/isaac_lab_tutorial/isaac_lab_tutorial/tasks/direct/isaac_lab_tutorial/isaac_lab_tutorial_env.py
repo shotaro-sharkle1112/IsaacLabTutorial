@@ -117,8 +117,9 @@ class IsaacLabTutorialEnv(DirectRLEnv):
 
     def _get_rewards(self) -> torch.Tensor:
         forward_reward = self.robot.data.root_com_lin_vel_b[:,0].reshape(-1,1)
+        forward_sat = torch.tanh(forward_reward)
         alignment_reward = torch.sum(self.forwards * self.commands, dim=-1, keepdim=True)
-        total_reward = forward_reward*torch.exp(alignment_reward)
+        total_reward = forward_sat*torch.exp(alignment_reward)
         return total_reward
 
     def _get_dones(self) -> tuple[torch.Tensor, torch.Tensor]:
