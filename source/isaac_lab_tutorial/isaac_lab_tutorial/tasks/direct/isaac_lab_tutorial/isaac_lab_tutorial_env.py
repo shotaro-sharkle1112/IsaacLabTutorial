@@ -119,7 +119,12 @@ class IsaacLabTutorialEnv(DirectRLEnv):
         forward_reward = self.robot.data.root_com_lin_vel_b[:,0].reshape(-1,1)
         forward_sat = torch.tanh(forward_reward)
         alignment_reward = torch.sum(self.forwards * self.commands, dim=-1, keepdim=True)
-        total_reward = forward_sat*torch.exp(alignment_reward)
+        theta_rad = torch.arccos(
+            torch.clamp(alignment_reward, -1.0, 1.0)
+        )
+        k = 10.0  # 角度ペナルティの強さ
+        penalty_angle = k * theta_rad
+        total_reward = forward_sat*torch.exp(alignment_reward) - penalty_angle
         return total_reward
 
     def _get_dones(self) -> tuple[torch.Tensor, torch.Tensor]:
