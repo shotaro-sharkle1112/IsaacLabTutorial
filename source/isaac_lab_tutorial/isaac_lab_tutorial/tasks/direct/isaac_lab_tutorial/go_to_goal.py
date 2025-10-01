@@ -47,7 +47,7 @@ class JetbotSceneCfg(InteractiveSceneCfg):
    Goal = RigidObjectCfg(
       prim_path="{ENV_REGEX_NS}/Goal",
       spawn=sim_utils.ConeCfg(
-         radius=0.15,
+         radius=0.2,
          height=0.5,
          rigid_props=sim_utils.RigidBodyPropertiesCfg(kinematic_enabled=True),
          collision_props=sim_utils.CollisionPropertiesCfg(collision_enabled=False),
@@ -147,8 +147,9 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             learning_state = 3
 
         elif learning_state == 3: # act
-            torque = torch.tensor([[1.0, 1.0]])
+            torque = torch.tensor([[10.0, 10.0]])
             steps += 1 
+            print(f"[INFO]: steps {steps}/{steps_threshold}")
             learning_state = 4
 
         elif learning_state == 4: # calculate reward and update Q-table
