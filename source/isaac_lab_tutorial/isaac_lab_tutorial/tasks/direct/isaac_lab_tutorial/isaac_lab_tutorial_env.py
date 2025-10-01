@@ -96,7 +96,7 @@ class IsaacLabTutorialEnv(DirectRLEnv):
         self.visualization_markers.visualize(loc, rots, marker_indices=indices)
 
     def _pre_physics_step(self, actions: torch.Tensor) -> None:
-        self.actions = actions.clone()# + torch.ones_like(actions)
+        self.actions = 10.0 * actions.clone()# + torch.ones_like(actions)
         self._visualize_markers()
 
     def _apply_action(self) -> None:
