@@ -26,6 +26,7 @@ LIMO_FRONT_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
         usd_path=_LIMO_USD,
     ),
+    # TODO:前輪のみ動かせているけど、後輪が引きずってて全く動かない
     actuators={
         # 前輪のみを制御対象に。ここに並べた順番がアクションの次元順になる想定（FL→FR）
         "front_wheels": ImplicitActuatorCfg(
