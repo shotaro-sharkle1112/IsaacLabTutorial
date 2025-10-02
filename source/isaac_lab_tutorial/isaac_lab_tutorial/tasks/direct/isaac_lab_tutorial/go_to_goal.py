@@ -8,6 +8,17 @@
 import argparse
 import math
 import random
+
+import onnxruntime as ort
+import numpy as np
+
+POLICY_PATH = "policy.onnx"
+OBS_SHAPE = (3,)     # 例: CartPole-v1 なら観測 4 次元。ご自身の環境に合わせて！
+ACTION_DIM = 2
+
+# ========= ONNX モデルの読み込み =========
+session = ort.InferenceSession(POLICY_PATH, providers=["CPUExecutionProvider"])
+
 from isaaclab.app import AppLauncher
 
 
@@ -32,15 +43,7 @@ from isaaclab.assets import AssetBaseCfg, ArticulationCfg, RigidObjectCfg
 from isaaclab.scene import InteractiveScene, InteractiveSceneCfg
 from isaac_lab_tutorial.robots.limo import LIMO_FRONT_CFG
 
-import onnxruntime as ort
-import numpy as np
 
-POLICY_PATH = "policy.onnx"
-OBS_SHAPE = (3,)     # 例: CartPole-v1 なら観測 4 次元。ご自身の環境に合わせて！
-ACTION_DIM = 2
-
-# ========= ONNX モデルの読み込み =========
-session = ort.InferenceSession(POLICY_PATH)
 x = np.random.randn(3, *OBS_SHAPE).astype(np.float32)
 pm, pls = ort_pol.run(None, {"obs": x})
 print("ONNX policy shapes:", pm.shape, pls.shape)
