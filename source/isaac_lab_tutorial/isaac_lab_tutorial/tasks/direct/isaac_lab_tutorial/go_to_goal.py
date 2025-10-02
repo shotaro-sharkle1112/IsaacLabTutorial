@@ -93,7 +93,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     # sim and learning
     sim_dt = sim.get_physics_dt()
     sim_time = 0.0
-    torque = torch.tensor([[0.0,0.0]])
+    torque = torch.tensor([[0.0,0.0,0.0,0.0]])
     learning_state = 0
     env_state = 0
     steps = 0
@@ -110,7 +110,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     while simulation_app.is_running():
 
         if learning_state == 0: # reset
-            torque = torch.tensor([[0.0,0.0]])
+            torque = torch.tensor([[0.0,0.0,0.0,0.0]])
             goal_direction = random.uniform(-math.pi, math.pi)
             goal[0:2] = torch.tensor([
                 initial_distance*math.cos(goal_direction), 
@@ -146,7 +146,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             print("[INFO]: Resetting Limo state...")
 
         elif learning_state == 1: # select action
-            torque = torch.tensor([[0.0,0.0]])
+            torque = torch.tensor([[0.0,0.0,0.0,0.0]])
 
             # TODO: 環境情報の取得から
             # get env information
@@ -162,7 +162,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             learning_state = 3
 
         elif learning_state == 3: # act
-            torque = torch.tensor([[10.0, 10.0]])
+            torque = torch.tensor([[10.0, 10.0,0.0,0.0]])
             steps += 1 
             print(f"[INFO]: steps {steps}/{steps_threshold}")
             learning_state = 4
