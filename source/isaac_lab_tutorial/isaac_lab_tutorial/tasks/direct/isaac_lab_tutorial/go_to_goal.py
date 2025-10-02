@@ -41,6 +41,7 @@ import torch
 import isaaclab.sim as sim_utils
 from isaaclab.assets import AssetBaseCfg, ArticulationCfg, RigidObjectCfg
 from isaaclab.scene import InteractiveScene, InteractiveSceneCfg
+import isaaclab.utils.math as math_utils
 from isaac_lab_tutorial.robots.limo import LIMO_FRONT_CFG
 
 
@@ -85,7 +86,15 @@ def limo_at_goal(scene:InteractiveScene, dist_threshold:float, goal:torch.Tensor
     else:
         return False
     
-
+def get_observation(scene, command):
+    forwards = math_utils.quat_apply(scene["Limo"].data.root_link_quat_w, scene["Limo"].data.FORWARD_VEC_B)
+    # obs = torch.hstack((self.velocity, self.commands))
+    
+    dot = torch.sum(forwards * command, dim=-1, keepdim=True).item()
+    cross = torch.cross(forwards, command, dim=-1)[:,-1].reshape(-1,1)
+    forward_speed = scene["Limo"].data.root_com_lin_vel_b[:,0].reshape(-1,1)
+    obs = np.array([[dot, cross.item(), forward_speed.item()]], dtype=np.float32)
+    return obs
 
     
 def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
@@ -98,7 +107,8 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     env_state = 0
     steps = 0
     episodes = 0
-    location = 0
+    pm  = np.zeros((1, ACTION_DIM), dtype=np.float32)   # 平均ベクトル
+    pls = np.zeros((1, ACTION_DIM), dtype=np.float32)
     goal = torch.tensor([0.0, 0.0, 0.0],device=scene.device)
     initial_distance = 2.0
     steps_threshold = 1000
@@ -150,9 +160,12 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
 
             # TODO: 環境情報の取得から
             # get env information
-            # observation = get_observation(scene)
+            # commandの生成：limoからゴールへのベクトル
+            command = goal - scene["Limo"].data.default_root_state.clone()[:3]
+            command = command / (torch.norm(command) + 1e-8)
+            obs = get_observation(scene, command)
             # select action
-            # action = agent.step(observation)
+            pm, pls = session.run(None, {"obs": obs})
             # change state
             learning_state = 2
 
@@ -162,7 +175,9 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             learning_state = 3
 
         elif learning_state == 3: # act
-            torque = torch.tensor([[10.0, 10.0,0.0,0.0]])
+            left_torque = pm[0][0]
+            right_torque = pm[0][0]
+            torque = 10.0 * torch.tensor([[left_torque, right_torque,0.0,0.0]])
             steps += 1 
             print(f"[INFO]: steps {steps}/{steps_threshold}")
             learning_state = 4
