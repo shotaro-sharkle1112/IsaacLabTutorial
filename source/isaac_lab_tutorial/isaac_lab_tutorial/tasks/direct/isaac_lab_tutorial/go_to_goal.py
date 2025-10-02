@@ -33,17 +33,18 @@ from isaaclab.scene import InteractiveScene, InteractiveSceneCfg
 from isaac_lab_tutorial.robots.limo import LIMO_FRONT_CFG
 
 import onnxruntime as ort
+import numpy as np
 
 POLICY_PATH = "policy.onnx"
+OBS_SHAPE = (3,)     # 例: CartPole-v1 なら観測 4 次元。ご自身の環境に合わせて！
+ACTION_DIM = 2
 
 # ========= ONNX モデルの読み込み =========
 session = ort.InferenceSession(POLICY_PATH)
-
-# 入力名と出力名を確認（基本は "obs", "action_mean", "action_log_std"）
-input_name = session.get_inputs()[0].name
-output_names = [o.name for o in session.get_outputs()]
-print("Input name:", input_name)
-print("Output names:", output_names)
+ort_pol = ort.InferenceSession("policy.onnx")
+x = np.random.randn(3, *OBS_SHAPE).astype(np.float32)
+pm, pls = ort_pol.run(None, {"obs": x})
+print("ONNX policy shapes:", pm.shape, pls.shape)
 
 # TODO: それぞれのinteractivesceneにデータを格納できるかを調べる
 class LimoSceneCfg(InteractiveSceneCfg):
