@@ -41,7 +41,6 @@ ACTION_DIM = 2
 
 # ========= ONNX モデルの読み込み =========
 session = ort.InferenceSession(POLICY_PATH)
-ort_pol = ort.InferenceSession("policy.onnx")
 x = np.random.randn(3, *OBS_SHAPE).astype(np.float32)
 pm, pls = ort_pol.run(None, {"obs": x})
 print("ONNX policy shapes:", pm.shape, pls.shape)
