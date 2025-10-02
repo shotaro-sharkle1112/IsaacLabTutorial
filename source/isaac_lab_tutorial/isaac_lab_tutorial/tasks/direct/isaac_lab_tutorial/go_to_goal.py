@@ -180,6 +180,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             # commandの生成：limoからゴールへのベクトル
             command = goal - scene["Limo"].data.default_root_state.clone()[0,:3]
             command = command / (torch.norm(command) + 1e-8)
+            print("[INFO]: command",command)
             obs = get_observation(scene, command)
             # select action
             pm, pls = session.run(None, {"obs": obs})
@@ -196,7 +197,6 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             right_torque = pm[0][0]
             torque = 10.0 * torch.tensor([[left_torque, right_torque,0.0,0.0]])
             steps += 1 
-            print(f"[INFO]: steps {steps}/{steps_threshold}")
             learning_state = 4
 
         elif learning_state == 4: # calculate reward and update Q-table
