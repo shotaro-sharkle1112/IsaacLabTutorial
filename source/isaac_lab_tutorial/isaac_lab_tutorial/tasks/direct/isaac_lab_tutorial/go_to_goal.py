@@ -30,10 +30,23 @@ import torch
 import isaaclab.sim as sim_utils
 from isaaclab.assets import AssetBaseCfg, ArticulationCfg, RigidObjectCfg
 from isaaclab.scene import InteractiveScene, InteractiveSceneCfg
-from isaac_lab_tutorial.robots.jetbot import JETBOT_CONFIG
+from isaac_lab_tutorial.robots.limo import LIMO_FRONT_CFG
+
+import onnxruntime as ort
+
+POLICY_PATH = "policy.onnx"
+
+# ========= ONNX モデルの読み込み =========
+session = ort.InferenceSession(POLICY_PATH)
+
+# 入力名と出力名を確認（基本は "obs", "action_mean", "action_log_std"）
+input_name = session.get_inputs()[0].name
+output_names = [o.name for o in session.get_outputs()]
+print("Input name:", input_name)
+print("Output names:", output_names)
 
 # TODO: それぞれのinteractivesceneにデータを格納できるかを調べる
-class JetbotSceneCfg(InteractiveSceneCfg):
+class LimoSceneCfg(InteractiveSceneCfg):
    """Designs the scene."""
 
    # Ground-plane
@@ -56,13 +69,13 @@ class JetbotSceneCfg(InteractiveSceneCfg):
       init_state=RigidObjectCfg.InitialStateCfg(pos=(10.0, 10.0, 0.15)),
    )
 
-   Jetbot = JETBOT_CONFIG.replace(
+   Limo = LIMO_FRONT_CFG.replace(
       prim_path="/World/envs/env_.*/Robot",
       )
 
-def jetbot_at_goal(scene:InteractiveScene, dist_threshold:float, goal:torch.Tensor) -> bool:
-    jetbot_state = scene["Jetbot"].data.root_state_w.clone()
-    c = jetbot_state[:, :3]
+def limo_at_goal(scene:InteractiveScene, dist_threshold:float, goal:torch.Tensor) -> bool:
+    limo_state = scene["Limo"].data.root_state_w.clone()
+    c = limo_state[:, :3]
     dist_err = torch.norm(c[0] - goal, p=2).item()
     if dist_err <= dist_threshold:
         return True
@@ -107,19 +120,19 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             root_goal_state[0, :3] = goal[:3]
             scene["Goal"].write_root_pose_to_sim(root_goal_state[:, :7])
             # reset the scene entities to their initial positions offset by the environment origins
-            root_Jetbot_state = scene["Jetbot"].data.default_root_state.clone()
-            root_Jetbot_state[:, :3] += scene.env_origins
+            root_Limo_state = scene["Limo"].data.default_root_state.clone()
+            root_Limo_state[:, :3] += scene.env_origins
 
-            # copy the default root state to the sim for the jetbot's orientation and velocity
-            scene["Jetbot"].write_root_pose_to_sim(root_Jetbot_state[:, :7])
-            scene["Jetbot"].write_root_velocity_to_sim(root_Jetbot_state[:, 7:])
+            # copy the default root state to the sim for the limo's orientation and velocity
+            scene["Limo"].write_root_pose_to_sim(root_Limo_state[:, :7])
+            scene["Limo"].write_root_velocity_to_sim(root_Limo_state[:, 7:])
 
             # copy the default joint states to the sim
             joint_pos, joint_vel = (
-                scene["Jetbot"].data.default_joint_pos.clone(),
-                scene["Jetbot"].data.default_joint_vel.clone(),
+                scene["Limo"].data.default_joint_pos.clone(),
+                scene["Limo"].data.default_joint_vel.clone(),
             )
-            scene["Jetbot"].write_joint_state_to_sim(joint_pos, joint_vel)
+            scene["Limo"].write_joint_state_to_sim(joint_pos, joint_vel)
 
             # clear internal buffers
             scene.reset()
@@ -159,14 +172,14 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             
         # check the termination conditions
         # box is goal location or steps over
-        if jetbot_at_goal(scene, dist_threshold, goal) or steps == steps_threshold:
+        if limo_at_goal(scene, dist_threshold, goal) or steps == steps_threshold:
             learning_state = 0
             steps = 0
             episodes += 1
             print(f"[INFO]: episodes {episodes}")
 
         # limoのトルクをかける
-        scene["Jetbot"].set_joint_velocity_target(torque)
+        scene["Limo"].set_joint_velocity_target(torque)
 
         scene.write_data_to_sim()
         sim.step()
@@ -184,7 +197,7 @@ def main():
     sim = sim_utils.SimulationContext(sim_cfg)
     sim.set_camera_view([3.5, 0.0, 3.2], [0.0, 0.0, 0.5])
     # Design scene
-    scene_cfg = JetbotSceneCfg(args_cli.num_envs, env_spacing=2.0)
+    scene_cfg = LimoSceneCfg(args_cli.num_envs, env_spacing=2.0)
     scene = InteractiveScene(scene_cfg)
     # Play the simulator
     sim.reset()
