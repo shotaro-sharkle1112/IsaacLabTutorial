@@ -161,7 +161,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             # TODO: 環境情報の取得から
             # get env information
             # commandの生成：limoからゴールへのベクトル
-            command = goal - scene["Limo"].data.default_root_state.clone()[:3]
+            command = goal - scene["Limo"].data.default_root_state.clone()[0,:3]
             command = command / (torch.norm(command) + 1e-8)
             obs = get_observation(scene, command)
             # select action
