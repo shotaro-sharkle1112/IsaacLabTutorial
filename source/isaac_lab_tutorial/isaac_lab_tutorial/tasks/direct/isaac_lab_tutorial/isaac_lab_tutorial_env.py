@@ -129,15 +129,14 @@ class IsaacLabTutorialEnv(DirectRLEnv):
         return total_reward
 
     def _get_dones(self) -> tuple[torch.Tensor, torch.Tensor]:
-        device = self.yaws.device              # 既存テンソルと同じデバイスを使う
-        N = self.cfg.scene.num_envs            # 環境の数
+        device = self.robot.data.joint_pos.device
+        N = self.cfg.scene.num_envs
 
-        # 途中終了が無いので全部 False の [N,1]
-        terminated = torch.zeros((N, 1), dtype=torch.bool, device=device)
+        # 例：途中終了なし
+        terminated = torch.zeros(N, dtype=torch.bool, device=device)
 
-        # タイムアウト条件を [N,1] に整形
-        time_out = (self.episode_length_buf >= self.max_episode_length - 1)
-        time_out = time_out.to(device=device, dtype=torch.bool).view(-1, 1)
+        # タイムアウト
+        time_out = (self.episode_length_buf >= self.max_episode_length - 1).to(device)
 
         return terminated, time_out
 
