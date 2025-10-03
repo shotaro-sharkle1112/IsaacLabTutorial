@@ -87,7 +87,6 @@ def limo_at_goal(scene:InteractiveScene, dist_threshold:float, goal:torch.Tensor
         return False
     
 def get_observation(scene, command) -> dict:
-    velocity = scene["Limo"].data.root_com_vel_w 
     forwards = math_utils.quat_apply(scene["Limo"].data.root_link_quat_w, scene["Limo"].data.FORWARD_VEC_B)
     # obs = torch.hstack((self.velocity, self.commands))
     
