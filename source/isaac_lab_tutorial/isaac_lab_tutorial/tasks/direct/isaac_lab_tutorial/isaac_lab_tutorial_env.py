@@ -44,6 +44,13 @@ class IsaacLabTutorialEnv(DirectRLEnv):
     def __init__(self, cfg: IsaacLabTutorialEnvCfg, render_mode: str | None = None, **kwargs):
         super().__init__(cfg, render_mode, **kwargs)
         self.dof_idx, _ = self.robot.find_joints(self.cfg.dof_names)
+        self.left_wheel_names  = ["front_left_wheel", "rear_left_wheel"]
+        self.right_wheel_names = ["front_right_wheel", "rear_right_wheel"]
+
+        self.left_ids,  _ = self.robot.find_joints(self.left_wheel_names)
+        self.right_ids, _ = self.robot.find_joints(self.right_wheel_names)
+
+        self.torque_scale = 1.0
 
     def _setup_scene(self):
         
@@ -97,7 +104,16 @@ class IsaacLabTutorialEnv(DirectRLEnv):
         self.visualization_markers.visualize(loc, rots, marker_indices=indices)
 
     def _pre_physics_step(self, actions: torch.Tensor) -> None:
-        self.actions = 10.0 * actions.clone()# + torch.ones_like(actions)
+        # 2次元 → 4輪分へ
+        left  = actions[:, 0:1] * self.torque_scale
+        right = actions[:, 1:2] * self.torque_scale
+
+        # 全DOF分のゼロ行列を作って、左右インデックスに代入
+        per_dof = torch.zeros((self.cfg.scene.num_envs, len(self.dof_idx)), device=left.device, dtype=left.dtype)
+        per_dof[:, self.left_ids]  = left
+        per_dof[:, self.right_ids] = right
+
+        self.actions = per_dof  # 形状: (num_envs, len(self.dof_idx))
         self._visualize_markers()
 
     def _apply_action(self) -> None:
