@@ -76,8 +76,8 @@ class Value(DeterministicMixin, Model):
         return v, {}
 
 # --- 前処理（学習時: RunningStandardScaler） ---
-state_preproc = RunningStandardScaler()
-value_preproc = RunningStandardScaler()
+state_preproc = RunningStandardScaler(size=OBS_DIM)
+value_preproc = RunningStandardScaler(size=OBS_DIM)
 
 # --- エージェントを構築（学習時の PPO 設定に整合） ---
 models = {
