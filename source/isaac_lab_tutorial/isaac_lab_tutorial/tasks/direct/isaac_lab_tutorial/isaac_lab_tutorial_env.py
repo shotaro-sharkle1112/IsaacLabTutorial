@@ -19,6 +19,8 @@ from isaaclab.markers import VisualizationMarkers, VisualizationMarkersCfg
 from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR
 import isaaclab.utils.math as math_utils
 
+from isaac_lab_tutorial.robots.limo import _FL, _FR, _RL, _RR
+
 def define_markers() -> VisualizationMarkers:
     """Define markers with various different shapes."""
     marker_cfg = VisualizationMarkersCfg(
@@ -44,11 +46,13 @@ class IsaacLabTutorialEnv(DirectRLEnv):
     def __init__(self, cfg: IsaacLabTutorialEnvCfg, render_mode: str | None = None, **kwargs):
         super().__init__(cfg, render_mode, **kwargs)
         self.dof_idx, _ = self.robot.find_joints(self.cfg.dof_names)
-        self.left_wheel_names  = ["front_left_wheel", "rear_left_wheel"]
-        self.right_wheel_names = ["front_right_wheel", "rear_right_wheel"]
+        self.wheel_names = [_FL, _FR, _RL, _RR]   # 左右/前後の順はお好みで
+        self.total_dofs = self.robot.data.joint_pos.shape[1]
 
-        self.left_ids,  _ = self.robot.find_joints(self.left_wheel_names)
-        self.right_ids, _ = self.robot.find_joints(self.right_wheel_names)
+        self.left_ids  = [self.wheel_ids[self.wheel_names.index(_FL)].item(),
+                        self.wheel_ids[self.wheel_names.index(_RL)].item()]
+        self.right_ids = [self.wheel_ids[self.wheel_names.index(_FR)].item(),
+                        self.wheel_ids[self.wheel_names.index(_RR)].item()]
 
         self.torque_scale = 10.0
 
@@ -104,16 +108,28 @@ class IsaacLabTutorialEnv(DirectRLEnv):
         self.visualization_markers.visualize(loc, rots, marker_indices=indices)
 
     def _pre_physics_step(self, actions: torch.Tensor) -> None:
-        # 2次元 → 4輪分へ
-        left  = actions[:, 0:1] * self.torque_scale
-        right = actions[:, 1:2] * self.torque_scale
+        # actions: (num_envs, 2) → [:,0]=左, [:,1]=右
+        device, dtype = actions.device, actions.dtype
+        N = self.num_envs
 
-        # 全DOF分のゼロ行列を作って、左右インデックスに代入
-        per_dof = torch.zeros((self.cfg.scene.num_envs, len(self.dof_idx)), device=left.device, dtype=left.dtype)
-        per_dof[:, self.left_ids]  = left
-        per_dof[:, self.right_ids] = right
+        # 全DOFぶんのゼロ行列（デバイスは actions に揃える）
+        per_dof = torch.zeros((N, self.total_dofs), device=device, dtype=dtype)
 
-        self.actions = per_dof  # 形状: (num_envs, len(self.dof_idx))
+        # 左右値をそれぞれ 2輪ぶんの列数に合わせて拡張
+        left_vals  = (actions[:, 0:1] * self.torque_scale).expand(-1, len(self.left_ids))
+        right_vals = (actions[:, 1:2] * (self.torque_scale * self.right_sign)).expand(-1, len(self.right_ids))
+
+        # Python list の列指定ならデバイス非依存で安全に代入できる
+        per_dof[:, self.left_ids]  = left_vals
+        per_dof[:, self.right_ids] = right_vals
+
+        # （任意）クリップで暴走防止
+        # max_eff = 2.0
+        # per_dof = torch.clamp(per_dof, -max_eff, max_eff)
+
+        self.actions = per_dof
+
+        # 既存の可視化
         self._visualize_markers()
 
     def _apply_action(self) -> None:
