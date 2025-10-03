@@ -129,6 +129,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     goal = torch.tensor([0.0, 0.0, 0.0],device=scene.device)
     initial_distance = 2.0
     steps_threshold = 1000
+    command_change = 100
     dist_threshold = 0.2
     obs = np.zeros((1, 3), dtype=np.float32)
 
@@ -176,8 +177,9 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             # TODO: 環境情報の取得から
             # get env information
             # commandの生成：limoからゴールへのベクトル
-            command = goal - scene["Limo"].data.root_state_w.clone()[0,:3]
-            command = command / (torch.norm(command) + 1e-8)
+            if steps % command_change == 0:
+                command = goal - scene["Limo"].data.root_state_w.clone()[0,:3]
+                command = command / (torch.norm(command) + 1e-8)
             print("[INFO]: command",command)
             obs = get_observation(scene, command)
             # select action
