@@ -42,7 +42,7 @@ import isaaclab.sim as sim_utils
 from isaaclab.assets import AssetBaseCfg, ArticulationCfg, RigidObjectCfg
 from isaaclab.scene import InteractiveScene, InteractiveSceneCfg
 import isaaclab.utils.math as math_utils
-from isaac_lab_tutorial.robots.limo import LIMO_FRONT_CFG
+from isaac_lab_tutorial.robots.limo import LIMO_CFG
 
 
 x = np.random.randn(3, *OBS_SHAPE).astype(np.float32)
@@ -73,7 +73,7 @@ class LimoSceneCfg(InteractiveSceneCfg):
       init_state=RigidObjectCfg.InitialStateCfg(pos=(10.0, 10.0, 0.15)),
    )
 
-   Limo = LIMO_FRONT_CFG.replace(
+   Limo = LIMO_CFG.replace(
       prim_path="/World/envs/env_.*/Robot",
       )
 
@@ -171,7 +171,6 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             print("[INFO]: Resetting Limo state...")
 
         elif learning_state == 1: # select action
-            torque = torch.tensor([[0.0,0.0,0.0,0.0]])
 
             # TODO: 環境情報の取得から
             # get env information
@@ -194,6 +193,8 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             left_torque = pm[0][0]
             right_torque = pm[0][0]
             torque = -10.0 * torch.tensor([[left_torque, right_torque,left_torque,right_torque]])
+            # limoのトルクをかける
+            scene["Limo"].set_joint_velocity_target(torque)
             steps += 1 
             learning_state = 4
 
@@ -211,8 +212,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             episodes += 1
             print(f"[INFO]: episodes {episodes}")
 
-        # limoのトルクをかける
-        scene["Limo"].set_joint_velocity_target(torque)
+        
 
         scene.write_data_to_sim()
         sim.step()
