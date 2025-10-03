@@ -97,8 +97,18 @@ class IsaacLabTutorialEnv(DirectRLEnv):
         self.visualization_markers.visualize(loc, rots, marker_indices=indices)
 
     def _pre_physics_step(self, actions: torch.Tensor) -> None:
-        self.actions = 10.0 * actions.clone()# + torch.ones_like(actions)
+        N = self.cfg.scene.num_envs
+        device, dtype = actions.device, actions.dtype
+        wheel_act = torch.zeros((N, 4), device=device, dtype=dtype)
+        left  = (actions[:, 0:1])                 # (N,1)
+        right = (actions[:, 1:2])
+
+        # 左: FL(0), RL(2) / 右: FR(1), RR(3) に同じ値を入れる
+        wheel_act[:, [0, 2]] = left.expand(-1, 2)                     # 左を2輪に展開
+        wheel_act[:, [1, 3]] = right.expand(-1, 2)                    # 右を2輪に展開
         print("[DEBUG]: actions shape",self.actions.shape)
+        self.actions = wheel_act
+
         self._visualize_markers()
 
     def _apply_action(self) -> None:
