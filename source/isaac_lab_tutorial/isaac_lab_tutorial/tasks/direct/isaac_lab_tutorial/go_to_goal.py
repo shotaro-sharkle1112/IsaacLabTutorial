@@ -130,6 +130,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     initial_distance = 2.0
     steps_threshold = 1000
     dist_threshold = 0.2
+    obs = np.zeros(3, dtype=np.float32)
 
     # goal consists of [target_pos(3), target_ang(1)]
    
@@ -192,6 +193,10 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
         elif learning_state == 3: # act
             left_torque = pm[0][0]
             right_torque = pm[0][0]
+
+            print(f"[INFO]: obs {obs}")
+            print(f"[INFO]: left {left_torque}, right {right_torque}")
+            
             torque = -10.0 * torch.tensor([[left_torque, right_torque,left_torque,right_torque]])
             # limoのトルクをかける
             scene["Limo"].set_joint_velocity_target(torque)
