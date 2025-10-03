@@ -98,7 +98,7 @@ class IsaacLabTutorialEnv(DirectRLEnv):
 
     def _pre_physics_step(self, actions: torch.Tensor) -> None:
         self.actions = 10.0 * actions.clone()# + torch.ones_like(actions)
-        print("[DEBUG]: actions shape",self.actions.shape())
+        print("[DEBUG]: actions shape",self.actions.shape)
         self._visualize_markers()
 
     def _apply_action(self) -> None:
