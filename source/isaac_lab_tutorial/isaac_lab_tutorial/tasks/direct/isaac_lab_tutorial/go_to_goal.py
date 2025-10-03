@@ -143,8 +143,6 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
                 initial_distance*math.cos(goal_direction), 
                 initial_distance*math.sin(goal_direction)
                 ],device=scene.device)
-            # ゴールが
-            goal = torch.tensor([1.0, 0.0, 0.0],device=scene.device)
             # ゴールの配置
             root_goal_state = scene["Goal"].data.default_root_state.clone()
             root_goal_state[0, :3] = goal[:3]
