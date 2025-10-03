@@ -106,7 +106,6 @@ class IsaacLabTutorialEnv(DirectRLEnv):
         # 左: FL(0), RL(2) / 右: FR(1), RR(3) に同じ値を入れる
         wheel_act[:, [0, 2]] = left.expand(-1, 2)                     # 左を2輪に展開
         wheel_act[:, [1, 3]] = right.expand(-1, 2)                    # 右を2輪に展開
-        print("[DEBUG]: actions shape",wheel_act.shape)
         self.actions = 10.0 * wheel_act
 
         self._visualize_markers()
