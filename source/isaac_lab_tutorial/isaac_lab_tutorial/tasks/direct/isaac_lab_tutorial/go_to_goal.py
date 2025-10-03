@@ -193,7 +193,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
         elif learning_state == 3: # act
             left_torque = pm[0][0]
             right_torque = pm[0][0]
-            torque = -100.0 * torch.tensor([[left_torque, right_torque,0.0,0.0]])
+            torque = -10.0 * torch.tensor([[left_torque, right_torque,left_torque,right_torque]])
             steps += 1 
             learning_state = 4
 
