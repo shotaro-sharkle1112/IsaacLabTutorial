@@ -91,7 +91,7 @@ def get_observation(scene, command) -> dict:
     # obs = torch.hstack((self.velocity, self.commands))
     
     dot = torch.sum(forwards[0] * command, dim=-1, keepdim=True)
-    cross = torch.cross(forwards[0], command, dim=-1)[:,-1].reshape(-1,1)
+    cross = torch.cross(forwards[0], command, dim=-1)[-1].reshape(-1,1)
     forward_speed = scene["Limo"].data.root_com_lin_vel_b[0,0:1].reshape(-1,1)
     
     obs = np.array([[dot.item(), cross.item(), forward_speed.item()]], dtype=np.float32)
