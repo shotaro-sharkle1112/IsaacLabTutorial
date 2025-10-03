@@ -76,8 +76,8 @@ class LimoSceneCfg(InteractiveSceneCfg):
    ConeX = RigidObjectCfg(
       prim_path="{ENV_REGEX_NS}/ConeX",
       spawn=sim_utils.ConeCfg(
-         radius=0.2,
-         height=0.7,
+         radius=0.1,
+         height=0.9,
          rigid_props=sim_utils.RigidBodyPropertiesCfg(kinematic_enabled=True),
          collision_props=sim_utils.CollisionPropertiesCfg(collision_enabled=False),
          visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.0, 1.0, 0.0), metallic=0.2, opacity=0.5),
