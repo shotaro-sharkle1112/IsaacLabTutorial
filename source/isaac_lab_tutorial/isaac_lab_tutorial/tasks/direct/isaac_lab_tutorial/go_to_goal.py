@@ -179,6 +179,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             # commandの生成：limoからゴールへのベクトル
             if steps % command_change == 0:
                 command = goal - scene["Limo"].data.root_state_w.clone()[0,:3]
+                command[2] = 0.0
                 command = command / (torch.norm(command) + 1e-8)
             print("[INFO]: command",command)
             obs = get_observation(scene, command)
