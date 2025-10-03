@@ -180,9 +180,9 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
         elif learning_state == 3: # act
             left_torque = pm[0][0]
             right_torque = pm[0][1]
-
-            print(f"[INFO]: obs {obs}")
-            print(f"[INFO]: left {left_torque}, right {right_torque}")
+            if steps % 20 == 0:
+                print(f"[INFO]: obs {obs}")
+                print(f"[INFO]: left {left_torque}, right {right_torque}")
             
             torque = -10.0 * torch.tensor([[left_torque, right_torque,left_torque,right_torque]])
             # limoのトルクをかける
