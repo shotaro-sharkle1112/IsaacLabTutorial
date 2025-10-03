@@ -73,6 +73,30 @@ class LimoSceneCfg(InteractiveSceneCfg):
       init_state=RigidObjectCfg.InitialStateCfg(pos=(10.0, 10.0, 0.15)),
    )
 
+   ConeX = RigidObjectCfg(
+      prim_path="{ENV_REGEX_NS}/ConeX",
+      spawn=sim_utils.ConeCfg(
+         radius=0.2,
+         height=0.7,
+         rigid_props=sim_utils.RigidBodyPropertiesCfg(kinematic_enabled=True),
+         collision_props=sim_utils.CollisionPropertiesCfg(collision_enabled=False),
+         visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.0, 1.0, 0.0), metallic=0.2, opacity=0.5),
+      ),
+      init_state=RigidObjectCfg.InitialStateCfg(pos=(1.0, 0.0, 0.0)),
+   )
+   ConeY = RigidObjectCfg(
+      prim_path="{ENV_REGEX_NS}/ConeY",
+      spawn=sim_utils.ConeCfg(
+         radius=0.1,
+         height=0.7,
+         rigid_props=sim_utils.RigidBodyPropertiesCfg(kinematic_enabled=True),
+         collision_props=sim_utils.CollisionPropertiesCfg(collision_enabled=False),
+         visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.0, 0.0, 1.0), metallic=0.2, opacity=0.5),
+      ),
+      init_state=RigidObjectCfg.InitialStateCfg(pos=(0.0, 1.0, 0.0)),
+   )
+
+
    Limo = LIMO_CFG.replace(
       prim_path="/World/envs/env_.*/Robot",
       )
@@ -165,7 +189,6 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
                 command = goal - scene["Limo"].data.root_state_w.clone()[0,:3]
                 command[2] = 0.0
                 command = command / (torch.norm(command) + 1e-8)
-            print("[INFO]: command",command)
             obs = get_observation(scene, command)
             # select action
             pm, pls = session.run(None, {"obs": obs})
@@ -183,6 +206,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             if steps % 20 == 0:
                 print(f"[INFO]: obs {obs}")
                 print(f"[INFO]: left {left_torque}, right {right_torque}")
+                print("[INFO]: command",command)
             
             torque = -10.0 * torch.tensor([[left_torque, right_torque,left_torque,right_torque]])
             # limoのトルクをかける
