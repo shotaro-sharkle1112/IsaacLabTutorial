@@ -86,31 +86,16 @@ def limo_at_goal(scene:InteractiveScene, dist_threshold:float, goal:torch.Tensor
     else:
         return False
     
-def get_observation(scene, command: torch.Tensor):
-    """
-    単一環境（num_envs=1）前提の観測生成。
-    - command: [3] 方向ベクトル（正規化されていなくてもOK。中で正規化）
-    戻り値: np.ndarray shape=(1,3) float32  -> ONNX にそのまま渡せる
-    """
-    device = scene.device
-    # ----- 前向きベクトル（ワールド座標） [3]
-    forwards = math_utils.quat_apply(
-        scene["Limo"].data.root_link_quat_w[0],  # quat: [4]
-        scene["Limo"].data.FORWARD_VEC_B[0]      # body前方: [3]
-    )  # -> [3]
-    # ----- command を [3] に整え & 正規化
-    command = command.to(device=device, dtype=forwards.dtype)
-    command = command / (torch.norm(command) + 1e-8)
-
-    # ----- dot/cross_z
-    dot = torch.sum(forwards * command).item()                      # スカラー
-    cross_z = torch.cross(forwards, command, dim=-1)[-1].item()     # z成分だけ
-
-    # ----- 前進速度（ボディ座標のx）
-    forward_speed = scene["Limo"].data.root_com_lin_vel_b[0, 0].item()
-
-    # ----- (1,3) float32 にして返す
-    obs = np.array([[dot, cross_z, forward_speed]], dtype=np.float32)
+def get_observation(scene, command) -> dict:
+    velocity = scene["Limo"].data.root_com_vel_w 
+    forwards = math_utils.quat_apply(scene["Limo"].data.root_link_quat_w, scene["Limo"].data.FORWARD_VEC_B)
+    # obs = torch.hstack((self.velocity, self.commands))
+    
+    dot = torch.sum(forwards * command, dim=-1, keepdim=True)
+    cross = torch.cross(forwards, command, dim=-1)[:,-1].reshape(-1,1)
+    forward_speed = scene["Limo"].data.root_com_lin_vel_b[:,0].reshape(-1,1)
+    
+    obs = np.array([[dot.item(), cross.item(), forward_speed.item()]], dtype=np.float32)
     return obs
 
     
