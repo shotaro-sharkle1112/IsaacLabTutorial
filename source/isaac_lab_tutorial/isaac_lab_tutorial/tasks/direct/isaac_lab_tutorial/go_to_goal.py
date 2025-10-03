@@ -90,9 +90,9 @@ def get_observation(scene, command) -> dict:
     forwards = math_utils.quat_apply(scene["Limo"].data.root_link_quat_w, scene["Limo"].data.FORWARD_VEC_B)
     # obs = torch.hstack((self.velocity, self.commands))
     
-    dot = torch.sum(forwards * command, dim=-1, keepdim=True)
-    cross = torch.cross(forwards, command, dim=-1)[:,-1].reshape(-1,1)
-    forward_speed = scene["Limo"].data.root_com_lin_vel_b[:,0].reshape(-1,1)
+    dot = torch.sum(forwards[0] * command, dim=-1, keepdim=True)
+    cross = torch.cross(forwards[0], command, dim=-1)[:,-1].reshape(-1,1)
+    forward_speed = scene["Limo"].data.root_com_lin_vel_b[0,0:1].reshape(-1,1)
     
     obs = np.array([[dot.item(), cross.item(), forward_speed.item()]], dtype=np.float32)
     return obs
