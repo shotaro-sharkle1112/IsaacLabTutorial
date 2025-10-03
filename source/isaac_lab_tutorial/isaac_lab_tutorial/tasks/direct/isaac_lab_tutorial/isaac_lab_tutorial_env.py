@@ -107,7 +107,7 @@ class IsaacLabTutorialEnv(DirectRLEnv):
         wheel_act[:, [0, 2]] = left.expand(-1, 2)                     # 左を2輪に展開
         wheel_act[:, [1, 3]] = right.expand(-1, 2)                    # 右を2輪に展開
         self.actions = 10.0 * wheel_act
-
+        print(f"[DEBUG]: left {left[0].item()}, right {right[0].item()}")
         self._visualize_markers()
 
     def _apply_action(self) -> None:
@@ -122,6 +122,7 @@ class IsaacLabTutorialEnv(DirectRLEnv):
         cross = torch.cross(self.forwards, self.commands, dim=-1)[:,-1].reshape(-1,1)
         forward_speed = self.robot.data.root_com_lin_vel_b[:,0].reshape(-1,1)
         obs = torch.hstack((dot, cross, forward_speed))
+        print("[DEBUG]: obs", obs[0])
         
         observations = {"policy": obs}
         return observations
