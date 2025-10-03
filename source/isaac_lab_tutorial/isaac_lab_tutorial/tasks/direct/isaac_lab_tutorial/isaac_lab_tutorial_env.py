@@ -50,7 +50,7 @@ class IsaacLabTutorialEnv(DirectRLEnv):
         self.left_ids,  _ = self.robot.find_joints(self.left_wheel_names)
         self.right_ids, _ = self.robot.find_joints(self.right_wheel_names)
 
-        self.torque_scale = 1.0
+        self.torque_scale = 10.0
 
     def _setup_scene(self):
         
