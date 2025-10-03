@@ -91,7 +91,33 @@ class IsaacLabTutorialEnv(DirectRLEnv):
         self.marker_offset[:,-1] = 0.5
         self.forward_marker_orientations = torch.zeros((self.cfg.scene.num_envs, 4)).cuda()
         self.command_marker_orientations = torch.zeros((self.cfg.scene.num_envs, 4)).cuda()
+
+        self._cache_wheel_indices()
         
+        
+    def _cache_wheel_indices(self):
+        """robot が初期化された後に一度だけ呼ぶ。ホイールのID等をキャッシュ。"""
+        # あなたの定義済み名（cfg からでも可）
+        wheel_names = [_FL, _FR, _RL, _RR]
+
+        wheel_ids_tensor, _ = self.robot.find_joints(wheel_names)
+        # 見つからない関節があればここで落として原因を明確化
+        if wheel_ids_tensor is None or len(wheel_ids_tensor) != 4:
+            raise RuntimeError(f"Wheel joints not found or incomplete: names={wheel_names}, ids={wheel_ids_tensor}")
+
+        self.wheel_names = wheel_names
+        self.wheel_ids = wheel_ids_tensor.tolist()  # Python list にしておくとインデクサとして安全
+
+        # 左右グループ（FL, RL を左 / FR, RR を右 として扱う）
+        # wheel_ids は “グローバル関節ID” なので、全DOF配列に対して列インデクサとして使える
+        self.left_ids  = [self.wheel_ids[wheel_names.index(_FL)],
+                          self.wheel_ids[wheel_names.index(_RL)]]
+        self.right_ids = [self.wheel_ids[wheel_names.index(_FR)],
+                          self.wheel_ids[wheel_names.index(_RR)]]
+
+        # 総DOF数（全関節数）
+        # API があれば self.robot.num_dof でもOK
+        self.total_dofs = int(self.robot.data.joint_pos.shape[1])
 
     def _visualize_markers(self):
         self.marker_locations = self.robot.data.root_pos_w
@@ -108,28 +134,24 @@ class IsaacLabTutorialEnv(DirectRLEnv):
         self.visualization_markers.visualize(loc, rots, marker_indices=indices)
 
     def _pre_physics_step(self, actions: torch.Tensor) -> None:
-        # actions: (num_envs, 2) → [:,0]=左, [:,1]=右
+        # actions: (num_envs, 2)  [:,0]=左  [:,1]=右
         device, dtype = actions.device, actions.dtype
-        N = self.num_envs
+        N = self.cfg.scene.num_envs
 
-        # 全DOFぶんのゼロ行列（デバイスは actions に揃える）
         per_dof = torch.zeros((N, self.total_dofs), device=device, dtype=dtype)
 
-        # 左右値をそれぞれ 2輪ぶんの列数に合わせて拡張
         left_vals  = (actions[:, 0:1] * self.torque_scale).expand(-1, len(self.left_ids))
         right_vals = (actions[:, 1:2] * (self.torque_scale * self.right_sign)).expand(-1, len(self.right_ids))
 
-        # Python list の列指定ならデバイス非依存で安全に代入できる
+        # Python list インデクシングはデバイス非依存で安全
         per_dof[:, self.left_ids]  = left_vals
         per_dof[:, self.right_ids] = right_vals
 
-        # （任意）クリップで暴走防止
+        # 例: クリップ
         # max_eff = 2.0
         # per_dof = torch.clamp(per_dof, -max_eff, max_eff)
 
         self.actions = per_dof
-
-        # 既存の可視化
         self._visualize_markers()
 
     def _apply_action(self) -> None:
