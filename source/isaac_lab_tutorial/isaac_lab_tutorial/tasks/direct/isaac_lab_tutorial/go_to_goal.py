@@ -200,7 +200,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             print(f"[INFO]: obs {obs}")
             print(f"[INFO]: left {left_torque}, right {right_torque}")
             
-            torque = -50.0 * torch.tensor([[left_torque, right_torque,left_torque,right_torque]])
+            torque = -10.0 * torch.tensor([[left_torque, right_torque,left_torque,right_torque]])
             # limoのトルクをかける
             scene["Limo"].set_joint_velocity_target(torque)
             steps += 1 
