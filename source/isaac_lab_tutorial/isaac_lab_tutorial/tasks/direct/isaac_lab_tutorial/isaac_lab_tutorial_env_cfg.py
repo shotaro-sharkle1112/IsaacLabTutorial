@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from isaac_lab_tutorial.robots.jetbot import JETBOT_CONFIG
-from isaac_lab_tutorial.robots.limo import LIMO_FRONT_CFG
+from isaac_lab_tutorial.robots.limo import LIMO_FRONT_CFG, LIMO_CFG
 
 from isaaclab.assets import ArticulationCfg
 from isaaclab.envs import DirectRLEnvCfg
@@ -45,7 +45,7 @@ class LimoEnvCfg(DirectRLEnvCfg):
     # simulation
     sim: SimulationCfg = SimulationCfg(dt=1 / 120, render_interval=decimation)
     # robot(s)
-    robot_cfg: ArticulationCfg = LIMO_FRONT_CFG.replace(prim_path="/World/envs/env_.*/Robot")
+    robot_cfg: ArticulationCfg = LIMO_CFG.replace(prim_path="/World/envs/env_.*/Robot")
     # scene
     scene: InteractiveSceneCfg = InteractiveSceneCfg(num_envs=100, env_spacing=2.0, replicate_physics=True)
     dof_names = ["front_left_wheel","front_right_wheel"]
