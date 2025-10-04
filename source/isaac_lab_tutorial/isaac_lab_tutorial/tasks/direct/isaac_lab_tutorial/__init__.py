@@ -61,8 +61,32 @@ gym.register(
 )
 
 gym.register(
+    id="Limo-Noise005",
+    entry_point=f"{__name__}.isaac_lab_tutorial_env:IsaacLabTutorialEnvWithNoise005",
+    disable_env_checker=True,
+    kwargs={
+        "env_cfg_entry_point": f"{__name__}.isaac_lab_tutorial_env_cfg:LimoEnvCfg",
+        "skrl_amp_cfg_entry_point": f"{agents.__name__}:skrl_amp_cfg.yaml",
+        "skrl_cfg_entry_point": f"{agents.__name__}:skrl_limo_ppo_cfg.yaml",
+        "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:PPORunnerCfg",
+    },
+)
+
+gym.register(
     id="Limo-Noise01",
     entry_point=f"{__name__}.isaac_lab_tutorial_env:IsaacLabTutorialEnvWithNoise01",
+    disable_env_checker=True,
+    kwargs={
+        "env_cfg_entry_point": f"{__name__}.isaac_lab_tutorial_env_cfg:LimoEnvCfg",
+        "skrl_amp_cfg_entry_point": f"{agents.__name__}:skrl_amp_cfg.yaml",
+        "skrl_cfg_entry_point": f"{agents.__name__}:skrl_limo_ppo_cfg.yaml",
+        "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:PPORunnerCfg",
+    },
+)
+
+gym.register(
+    id="Limo-Noise02",
+    entry_point=f"{__name__}.isaac_lab_tutorial_env:IsaacLabTutorialEnvWithNoise02",
     disable_env_checker=True,
     kwargs={
         "env_cfg_entry_point": f"{__name__}.isaac_lab_tutorial_env_cfg:LimoEnvCfg",

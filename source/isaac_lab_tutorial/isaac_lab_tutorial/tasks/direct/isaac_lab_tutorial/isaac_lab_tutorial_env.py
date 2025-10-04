@@ -175,6 +175,23 @@ class IsaacLabTutorialEnv(DirectRLEnv):
         self.robot.write_root_state_to_sim(default_root_state, env_ids)
         self._visualize_markers()
 
+class IsaacLabTutorialEnvWithNoise005(IsaacLabTutorialEnv):
+    def _get_observations(self) -> dict:
+        self.velocity = self.robot.data.root_com_vel_w 
+        self.forwards = math_utils.quat_apply(self.robot.data.root_link_quat_w, self.robot.data.FORWARD_VEC_B)
+        # obs = torch.hstack((self.velocity, self.commands))
+
+        noise = torch.randn_like(self.forwards) * math.sqrt(0.05)
+        self.forwards = self.forwards + noise
+        
+        dot = torch.sum(self.forwards * self.commands, dim=-1, keepdim=True)
+        cross = torch.cross(self.forwards, self.commands, dim=-1)[:,-1].reshape(-1,1)
+        forward_speed = self.robot.data.root_com_lin_vel_b[:,0].reshape(-1,1)
+        obs = torch.hstack((dot, cross, forward_speed))
+        
+        observations = {"policy": obs}
+        return observations
+    
 class IsaacLabTutorialEnvWithNoise01(IsaacLabTutorialEnv):
     def _get_observations(self) -> dict:
         self.velocity = self.robot.data.root_com_vel_w 
