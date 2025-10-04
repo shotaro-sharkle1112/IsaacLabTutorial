@@ -21,6 +21,9 @@ parser = argparse.ArgumentParser(
     description="This script demonstrates adding a custom robot to an Isaac Lab environment."
 )
 parser.add_argument("--num_envs", type=int, default=1, help="Number of environments to spawn.")
+parser.add_argument("--p", type=float, default=1.0, help="Number of environments to spawn.")
+parser.add_argument("--i", type=float, default=0.0, help="Number of environments to spawn.")
+parser.add_argument("--d", type=float, default=0.0, help="Number of environments to spawn.")
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
 # parse the arguments
@@ -125,9 +128,6 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     steps_threshold = 100
     dist_threshold = 0.2
     # --- パラメータ設定 ---
-    Kp = 20.0  # 比例ゲイン
-    Ki = 0.0  # 積分ゲイン
-    Kd = 0.0  # 微分ゲイン
 
     integral_error = 0.0
     previous_error = 0.0
@@ -186,7 +186,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             derivative_error = (normalized_error - previous_error) / sim_dt
             previous_error = normalized_error
             
-            target_angular_vel = (Kp * normalized_error) + (Ki * integral_error) + (Kd * derivative_error)
+            target_angular_vel = (args_cli.p * normalized_error) + (args_cli.i * integral_error) + (args_cli.d * derivative_error)
             if steps % 20 == 0:
                 print("[DEBUG]: degree_error",math.degrees(yaw_error))
                 print("[DEBUG]: target_angular_vel",target_angular_vel)
