@@ -177,7 +177,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             # get env information
             # 角度誤差を取得する
             root_Limo_state = scene["Limo"].data.root_state_w.clone()
-            limo_yaw = math_utils.euler_xyz_from_quat(root_Limo_state[:,3:7])[0,2]
+            limo_yaw = math_utils.euler_xyz_from_quat(root_Limo_state[:,3:7])[2][0]
             yaw_error = limo_yaw.item() - goal_direction
             
             normalized_error = math.atan2(math.sin(yaw_error),math.cos(yaw_error))
