@@ -124,7 +124,13 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     goal = torch.tensor([0.0, 0.0, 0.0],device=scene.device)
     steps_threshold = 1000
     dist_threshold = 0.2
-    obs = np.zeros((1, 3), dtype=np.float32)
+    # --- パラメータ設定 ---
+    Kp = 2.0  # 比例ゲイン
+    Ki = 0.1  # 積分ゲイン
+    Kd = 0.5  # 微分ゲイン
+
+    integral_error = 0.0
+    previous_error = 0.0
 
     # goal consists of [target_pos(3), target_ang(1)]
    
@@ -169,11 +175,23 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
 
             # TODO: 環境情報の取得から
             # get env information
-            # commandの生成：limoからゴールへのベクトル
+            # 角度誤差を取得する
+            root_Limo_state = scene["Limo"].data.root_state_w.clone()
+            limo_yaw = math_utils.yaw_quat(root_Limo_state[0,3:7])
+            yaw_error = limo_yaw.item() - goal_direction
             
+            normalized_error = math.atan2(math.sin(yaw_error),math.cos(yaw_error))
 
+            integral_error += normalized_error * sim_dt
+            derivative_error = (normalized_error - previous_error) / sim_dt
+            previous_error = normalized_error
+            
+            target_angular_vel = (Kp * normalized_error) + (Ki * integral_error) + (Kd * derivative_error)
+            if steps % 20 == 0:
+                print("[DEBUG]: yaw_error",yaw_error)
+                print("[DEBUG]: target_angular_vel",target_angular_vel)
             # select action
-            target_vel = torch.tensor([[2.0, -2.0, 2.0, -2.0]], device=scene.device)
+            target_vel = torch.tensor([[target_angular_vel, -target_angular_vel, target_angular_vel, -target_angular_vel]], device=scene.device)
             # change state
             learning_state = 2
 
