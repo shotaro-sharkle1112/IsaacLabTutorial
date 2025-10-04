@@ -141,8 +141,8 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             target_vel = torch.tensor([[0.0,0.0,0.0,0.0]])
             goal_direction = random.uniform(-math.pi, math.pi)
             goal[0:2] = torch.tensor([
-                math.cos(goal_direction), 
-                math.sin(goal_direction)
+                0.5* math.cos(goal_direction), 
+                0.5* math.sin(goal_direction)
                 ],device=scene.device)
             # ゴールの配置
             root_goal_state = scene["Goal"].data.default_root_state.clone()
