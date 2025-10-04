@@ -107,10 +107,14 @@ class IsaacLabTutorialEnv(DirectRLEnv):
         wheel_act[:, [0, 2]] = left.expand(-1, 2)                     # 左を2輪に展開
         wheel_act[:, [1, 3]] = right.expand(-1, 2)                    # 右を2輪に展開
         self.actions = 10.0 * wheel_act
-        print(f"[DEBUG]: left {left[0].item()}, right {right[0].item()}")
         self._visualize_markers()
 
     def _apply_action(self) -> None:
+        root_Limo_state = self.robot.data.root_state_w.clone()
+        goal_direction = math_utils.euler_xyz_from_quat(self.commands)[2][0]
+        limo_yaw = math_utils.euler_xyz_from_quat(root_Limo_state[:,3:7])[2][0]
+        yaw_error = limo_yaw.item() - goal_direction
+        print("[DEBUG]: degree_error",math.degrees(yaw_error))
         self.robot.set_joint_velocity_target(self.actions, joint_ids=self.dof_idx)
 
     def _get_observations(self) -> dict:
@@ -122,7 +126,6 @@ class IsaacLabTutorialEnv(DirectRLEnv):
         cross = torch.cross(self.forwards, self.commands, dim=-1)[:,-1].reshape(-1,1)
         forward_speed = self.robot.data.root_com_lin_vel_b[:,0].reshape(-1,1)
         obs = torch.hstack((dot, cross, forward_speed))
-        print("[DEBUG]: obs", obs[0])
         
         observations = {"policy": obs}
         return observations

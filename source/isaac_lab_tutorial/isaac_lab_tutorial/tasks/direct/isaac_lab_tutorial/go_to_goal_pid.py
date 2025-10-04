@@ -127,7 +127,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     goal = torch.tensor([0.0, 0.0, 0.0],device=scene.device)
     steps_threshold = 100
     dist_threshold = 0.2
-    # --- パラメータ設定 ---
+    yaw_error = 0.0
 
     integral_error = 0.0
     previous_error = 0.0
@@ -187,9 +187,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             previous_error = normalized_error
             
             target_angular_vel = (args_cli.p * normalized_error) + (args_cli.i * integral_error) + (args_cli.d * derivative_error)
-            if steps % 20 == 0:
-                print("[DEBUG]: degree_error",math.degrees(yaw_error))
-                print("[DEBUG]: target_angular_vel",target_angular_vel)
+                
             # select action
             target_vel = torch.tensor([[target_angular_vel, -target_angular_vel, target_angular_vel, -target_angular_vel]], device=scene.device)
             # change state
@@ -222,7 +220,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
 
         
 
-        
+        print("[DEBUG]: degree_error",math.degrees(yaw_error))
         sim.step()
         scene.write_data_to_sim()
         sim_time += sim_dt
