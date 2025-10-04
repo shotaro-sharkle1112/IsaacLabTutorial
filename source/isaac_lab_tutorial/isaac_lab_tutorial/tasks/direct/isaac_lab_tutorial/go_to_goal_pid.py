@@ -125,7 +125,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     steps_threshold = 100
     dist_threshold = 0.2
     # --- パラメータ設定 ---
-    Kp = 10.0  # 比例ゲイン
+    Kp = 20.0  # 比例ゲイン
     Ki = 0.1  # 積分ゲイン
     Kd = 0.5  # 微分ゲイン
 
