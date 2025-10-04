@@ -122,7 +122,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     steps = 0
     episodes = 0
     goal = torch.tensor([0.0, 0.0, 0.0],device=scene.device)
-    steps_threshold = 1000
+    steps_threshold = 100
     dist_threshold = 0.2
     # --- パラメータ設定 ---
     Kp = 2.0  # 比例ゲイン
@@ -188,7 +188,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             
             target_angular_vel = (Kp * normalized_error) + (Ki * integral_error) + (Kd * derivative_error)
             if steps % 20 == 0:
-                print("[DEBUG]: yaw_error",yaw_error)
+                print("[DEBUG]: degree_error",math.degrees(yaw_error))
                 print("[DEBUG]: target_angular_vel",target_angular_vel)
             # select action
             target_vel = torch.tensor([[target_angular_vel, -target_angular_vel, target_angular_vel, -target_angular_vel]], device=scene.device)
