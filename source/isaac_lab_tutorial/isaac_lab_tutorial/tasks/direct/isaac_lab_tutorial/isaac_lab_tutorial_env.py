@@ -113,7 +113,7 @@ class IsaacLabTutorialEnv(DirectRLEnv):
         root_Limo_state = self.robot.data.root_state_w.clone()
         limo_yaw = math_utils.euler_xyz_from_quat(root_Limo_state[:,3:7])[2][0]
         yaw_error = limo_yaw.item() - self.yaws[0].item()
-        print("[DEBUG]: degree_error",math.degrees(yaw_error))
+        # print("[DEBUG]: degree_error",math.degrees(yaw_error))
         self.robot.set_joint_velocity_target(self.actions, joint_ids=self.dof_idx)
 
     def _get_observations(self) -> dict:
