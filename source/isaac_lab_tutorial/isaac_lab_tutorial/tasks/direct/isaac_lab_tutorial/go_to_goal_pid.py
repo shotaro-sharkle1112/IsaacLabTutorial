@@ -140,6 +140,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
         if learning_state == 0: # reset
             target_vel = torch.tensor([[0.0,0.0,0.0,0.0]])
             goal_direction = random.uniform(-math.pi, math.pi)
+            goal_direction = math.radians(37.66265346087996)
             goal[0:2] = torch.tensor([
                 0.5* math.cos(goal_direction), 
                 0.5* math.sin(goal_direction)
