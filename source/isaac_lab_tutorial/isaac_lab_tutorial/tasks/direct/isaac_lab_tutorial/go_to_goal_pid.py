@@ -185,7 +185,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             normalized_error = math.atan2(math.sin(yaw_error),math.cos(yaw_error))
 
             noise_rad = random.gauss(0, 1)
-            noise_rad = noise_rad * math.radians(args_cli.std_rad)
+            noise_rad = noise_rad * math.radians(args_cli.std_deg)
 
             normalized_error += noise_rad
 
