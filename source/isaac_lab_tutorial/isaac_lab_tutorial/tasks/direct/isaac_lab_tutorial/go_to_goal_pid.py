@@ -24,6 +24,7 @@ parser.add_argument("--num_envs", type=int, default=1, help="Number of environme
 parser.add_argument("--p", type=float, default=1.0, help="Number of environments to spawn.")
 parser.add_argument("--i", type=float, default=0.0, help="Number of environments to spawn.")
 parser.add_argument("--d", type=float, default=0.0, help="Number of environments to spawn.")
+parser.add_argument("--std_deg", type=float, default=0.0, help="Number of environments to spawn.")
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
 # parse the arguments
@@ -182,6 +183,15 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             yaw_error = limo_yaw.item() - goal_direction
             
             normalized_error = math.atan2(math.sin(yaw_error),math.cos(yaw_error))
+
+            noise_rad = random.gauss(0, 1)
+            noise_rad = noise_rad * math.radians(args_cli.std_rad)
+
+            normalized_error += noise_rad
+
+            normalized_error = math.atan2(math.sin(normalized_error),math.cos(normalized_error))
+
+
 
             integral_error += normalized_error * sim_dt
             derivative_error = (normalized_error - previous_error) / sim_dt
