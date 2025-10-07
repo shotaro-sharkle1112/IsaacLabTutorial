@@ -171,7 +171,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             # change state
             learning_state = 1
 
-            print("[INFO]: Resetting Limo state...")
+            # print("[INFO]: Resetting Limo state...")
 
         if learning_state == 1: # select action
 
@@ -227,7 +227,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             learning_state = 0
             steps = 0
             episodes += 1
-            print(f"[INFO]: episodes {episodes}")
+            # print(f"[INFO]: episodes {episodes}")
             print("[DEBUG]: degree_error",math.degrees(yaw_error))
 
         
