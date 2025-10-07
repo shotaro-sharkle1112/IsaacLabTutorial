@@ -126,7 +126,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     steps = 0
     episodes = 0
     goal = torch.tensor([0.0, 0.0, 0.0],device=scene.device)
-    steps_threshold = 100
+    steps_threshold = 300
     dist_threshold = 0.2
     yaw_error = 0.0
 
@@ -173,7 +173,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
 
             print("[INFO]: Resetting Limo state...")
 
-        elif learning_state == 1: # select action
+        if learning_state == 1: # select action
 
             # TODO: 環境情報の取得から
             # get env information
@@ -204,18 +204,18 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             # change state
             learning_state = 2
 
-        elif learning_state == 2: # move
+        if learning_state == 2: # move
          # NOTE:ここは何も書かない
             # change state
             learning_state = 3
 
-        elif learning_state == 3: # act
+        if learning_state == 3: # act
             # limoの速度をかける
             scene["Limo"].set_joint_velocity_target(target_vel)
             steps += 1 
             learning_state = 4
 
-        elif learning_state == 4: # calculate reward and update Q-table
+        if learning_state == 4: # calculate reward and update Q-table
             # NOTE:trainではないので必要ない
 
             # go back to selecting action
@@ -228,10 +228,11 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             steps = 0
             episodes += 1
             print(f"[INFO]: episodes {episodes}")
+            print("[DEBUG]: degree_error",math.degrees(yaw_error))
 
         
 
-        print("[DEBUG]: degree_error",math.degrees(yaw_error))
+        
         sim.step()
         scene.write_data_to_sim()
         sim_time += sim_dt
