@@ -168,6 +168,10 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             # clear internal buffers
             scene.reset()
 
+            integral_error = 0.0
+            derivative_error = 0.0
+            previous_error = 0.0
+
             # change state
             learning_state = 1
 
