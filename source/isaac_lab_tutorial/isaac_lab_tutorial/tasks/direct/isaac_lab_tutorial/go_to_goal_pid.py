@@ -204,7 +204,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             target_angular_vel = (args_cli.p * normalized_error) + (args_cli.i * integral_error) + (args_cli.d * derivative_error)
                 
             # select action
-            target_vel = torch.tensor([[target_angular_vel, -target_angular_vel, target_angular_vel, -target_angular_vel]], device=scene.device)
+            target_vel = torch.tensor([[target_angular_vel, -target_angular_vel, target_angular_vel, -target_angular_vel, 0.0]], device=scene.device)
             # change state
             learning_state = 2
 
