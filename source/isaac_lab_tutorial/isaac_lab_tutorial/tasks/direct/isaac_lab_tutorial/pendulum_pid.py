@@ -132,8 +132,6 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
 
     integral_error = 0.0
     previous_error = 0.0
-
-    # goal consists of [target_pos(3), target_ang(1)]
    
 
     while simulation_app.is_running():
@@ -155,9 +153,11 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
                 scene["Limo"].data.default_joint_pos.clone(),
                 scene["Limo"].data.default_joint_vel.clone(),
             )
+            
+            rand = torch.rand(1, device=scene.device).item() * torch.pi - (torch.pi/2.0)
+            joint_pos[0, 4] = rand
+
             scene["Limo"].write_joint_state_to_sim(joint_pos, joint_vel)
-            # 振子の角度をランダム化
-            scene["Limo"].set_joint_position_target(torch.tensor([[0.0,0.0,0.0,0.0,torch.rand(1).item()*torch.pi-torch.pi/2.0]]))
             # clear internal buffers
             scene.reset()
 
