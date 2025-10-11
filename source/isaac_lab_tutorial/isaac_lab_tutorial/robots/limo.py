@@ -14,11 +14,18 @@ _RL = "rear_left_wheel"
 _RR = "rear_right_wheel"
 
 LIMO_CFG = ArticulationCfg(
-    prim_path="/World/envs/env_.*/robot",  # envクローン対応
-    spawn=sim_utils.UsdFileCfg(
-        usd_path=_LIMO_USD,
-    ),
-    actuators={"wheel_acts": ImplicitActuatorCfg(joint_names_expr=[".*"], damping=None, stiffness=None)},
+    prim_path="/World/envs/env_.*/robot",
+    spawn=sim_utils.UsdFileCfg(usd_path=_LIMO_USD),
+    actuators={
+        "wheel_acts": ImplicitActuatorCfg(
+            joint_names_expr=[".*wheel.*"],
+            stiffness=0.0, damping=1.0e4, effort_limit_sim=400.0,
+        ),
+        "pend_passive": ImplicitActuatorCfg(
+            joint_names_expr=["pendulum"],  # ←実名に
+            stiffness=0.0, damping=0.0,   # 完全受動
+        ),
+    },
 )
 
 LIMO_FRONT_CFG = ArticulationCfg(
