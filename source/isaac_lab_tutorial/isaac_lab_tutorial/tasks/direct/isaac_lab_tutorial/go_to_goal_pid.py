@@ -234,6 +234,8 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             # print(f"[INFO]: episodes {episodes}")
             print("[DEBUG]: degree_error",math.degrees(yaw_error))
 
+        if steps % 20 == 0:
+            print("[DEBUG]: joint_pos", scene["Limo"].data.joint_pos)
         
 
         
