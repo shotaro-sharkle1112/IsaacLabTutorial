@@ -26,6 +26,7 @@ parser.add_argument("--i", type=float, default=0.0, help="Number of environments
 parser.add_argument("--d", type=float, default=0.0, help="Number of environments to spawn.")
 parser.add_argument("--std_deg", type=float, default=0.0, help="Number of environments to spawn.")
 parser.add_argument("--area", type=float, default=0.0, help="Number of environments to spawn.")
+parser.add_argument("--kv", type=float, default=0.0, help="Number of environments to spawn.")
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
 # parse the arguments
