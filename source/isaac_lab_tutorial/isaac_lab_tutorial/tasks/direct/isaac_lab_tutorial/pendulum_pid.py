@@ -139,8 +139,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     while simulation_app.is_running():
 
         if learning_state == 0: # reset
-            # 振子の角度をランダム化
-            scene["Limo"].set_joint_position_target(torch.tensor([[0.0,0.0,0.0,0.0,torch.rand(1).item()*torch.pi-torch.pi/2.0]]))
+            
 
             target_vel = torch.tensor([[0.0,0.0,0.0,0.0,0.0]])
             # reset the scene entities to their initial positions offset by the environment origins
@@ -157,7 +156,8 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
                 scene["Limo"].data.default_joint_vel.clone(),
             )
             scene["Limo"].write_joint_state_to_sim(joint_pos, joint_vel)
-
+            # 振子の角度をランダム化
+            scene["Limo"].set_joint_position_target(torch.tensor([[0.0,0.0,0.0,0.0,torch.rand(1).item()*torch.pi-torch.pi/2.0]]))
             # clear internal buffers
             scene.reset()
 
