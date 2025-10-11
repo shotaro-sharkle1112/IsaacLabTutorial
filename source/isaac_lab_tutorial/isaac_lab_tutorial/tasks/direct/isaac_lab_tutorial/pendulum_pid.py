@@ -126,7 +126,6 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     env_state = 0
     steps = 0
     episodes = 0
-    goal = torch.tensor([0.0, 0.0, 0.0],device=scene.device)
     steps_threshold = 300
     dist_threshold = 0.2
     yaw_error = 0.0
@@ -208,7 +207,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             
         # check the termination conditions
         # box is goal location or steps over
-        if limo_at_goal(scene, dist_threshold, goal) or steps == steps_threshold:
+        if steps == steps_threshold:
             learning_state = 0
             steps = 0
             episodes += 1
