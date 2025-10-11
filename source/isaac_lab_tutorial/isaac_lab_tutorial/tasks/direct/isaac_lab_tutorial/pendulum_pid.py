@@ -153,8 +153,10 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
                 scene["Limo"].data.default_joint_pos.clone(),
                 scene["Limo"].data.default_joint_vel.clone(),
             )
+
+            pendulum_area = torch.pi/9.0
             
-            rand = torch.rand(1, device=scene.device).item() * torch.pi - (torch.pi/2.0)
+            rand = torch.rand(1, device=scene.device).item() * pendulum_area - (pendulum_area/2.0)
             joint_pos[0, 4] = rand
 
             scene["Limo"].write_joint_state_to_sim(joint_pos, joint_vel)
