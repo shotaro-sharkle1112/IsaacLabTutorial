@@ -179,13 +179,13 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             # get env information
 
             normalized_error = scene["Limo"].data.joint_pos[0,4]
-
+            xdot = scene["Limo"].data.root_lin_vel_w[0,0].item()
             integral_error += normalized_error * sim_dt
             derivative_error = (normalized_error - previous_error) / sim_dt
             previous_error = normalized_error
             
             target_angular_vel = (args_cli.p * normalized_error) + (args_cli.i * integral_error) + (args_cli.d * derivative_error)
-                
+            target_angular_vel = target_angular_vel - args_cli.kv * xdot
             # select action
             target_vel = torch.tensor([[target_angular_vel, target_angular_vel, target_angular_vel, target_angular_vel, 0.0]], device=scene.device)
             # change state
