@@ -5,7 +5,7 @@ from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR
 from isaaclab.actuators import ImplicitActuatorCfg
 
 # ⚠️ あなたの環境の LIMO USD に合わせて変更してください
-_LIMO_USD = f"{ISAAC_NUCLEUS_DIR}/Robots/AgilexRobotics/limo/limo.usd"
+_LIMO_USD = r"C:\Users\xr\Downloads\limo.usd"
 
 # ✅ USD にある4つの車輪ジョイント名（実ファイルに合わせて必要なら微修正）
 _FL = "front_left_wheel"
