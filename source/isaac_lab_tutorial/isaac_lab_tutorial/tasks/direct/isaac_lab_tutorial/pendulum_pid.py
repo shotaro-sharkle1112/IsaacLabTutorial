@@ -220,7 +220,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             episodes += 1
 
         if steps % 20 == 0:
-            print("[DEBUG]: pendulum ", torch.rad2deg(scene["Limo"].data.joint_pos[0,4]))
+            print("[DEBUG]: pendulum ", torch.rad2deg(scene["Limo"].data.joint_pos[0,4]).item())
         
 
         
