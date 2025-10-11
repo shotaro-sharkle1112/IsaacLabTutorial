@@ -235,7 +235,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             print("[DEBUG]: degree_error",math.degrees(yaw_error))
 
         if steps % 20 == 0:
-            print("[DEBUG]: joint_pos", scene["Limo"].data.joint_pos)
+            print("[DEBUG]: pendulum ", torch.rad2deg(scene["Limo"].data.joint_pos[4]))
         
 
         
