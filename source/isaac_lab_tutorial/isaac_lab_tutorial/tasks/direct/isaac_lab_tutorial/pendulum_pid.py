@@ -120,7 +120,8 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     # sim and learning
     sim_dt = sim.get_physics_dt()
     sim_time = 0.0
-    target_vel = torch.tensor([[0.0,0.0,0.0,0.0]])
+    target_vel = torch.tensor([[0.0,0.0,0.0,0.0,0.0]])
+
     learning_state = 0
     env_state = 0
     steps = 0
@@ -139,17 +140,10 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     while simulation_app.is_running():
 
         if learning_state == 0: # reset
-            target_vel = torch.tensor([[0.0,0.0,0.0,0.0]])
-            goal_direction = random.uniform(-math.pi, math.pi)
-            # goal_direction = math.radians(37.66265346087996)
-            goal[0:2] = torch.tensor([
-                0.5* math.cos(goal_direction), 
-                0.5* math.sin(goal_direction)
-                ],device=scene.device)
-            # ゴールの配置
-            root_goal_state = scene["Goal"].data.default_root_state.clone()
-            root_goal_state[0, :3] = goal[:3]
-            scene["Goal"].write_root_pose_to_sim(root_goal_state[:, :7])
+            # 振子の角度をランダム化
+            scene["Limo"].set_joint_position_target(torch.tensor([[0.0,0.0,0.0,0.0,torch.rand().item()*180.0-90.0]]))
+
+            target_vel = torch.tensor([[0.0,0.0,0.0,0.0,0.0]])
             # reset the scene entities to their initial positions offset by the environment origins
             root_Limo_state = scene["Limo"].data.default_root_state.clone()
             root_Limo_state[:, :3] += scene.env_origins
