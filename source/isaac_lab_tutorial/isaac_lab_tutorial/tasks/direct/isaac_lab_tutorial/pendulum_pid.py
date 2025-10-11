@@ -25,6 +25,7 @@ parser.add_argument("--p", type=float, default=1.0, help="Number of environments
 parser.add_argument("--i", type=float, default=0.0, help="Number of environments to spawn.")
 parser.add_argument("--d", type=float, default=0.0, help="Number of environments to spawn.")
 parser.add_argument("--std_deg", type=float, default=0.0, help="Number of environments to spawn.")
+parser.add_argument("--area", type=float, default=0.0, help="Number of environments to spawn.")
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
 # parse the arguments
@@ -154,7 +155,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
                 scene["Limo"].data.default_joint_vel.clone(),
             )
 
-            pendulum_area = torch.pi/18.0
+            pendulum_area = torch.pi*args_cli.area/180.0
             
             rand = torch.rand(1, device=scene.device).item() * pendulum_area - (pendulum_area/2.0)
             joint_pos[0, 4] = rand
