@@ -141,7 +141,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
 
         if learning_state == 0: # reset
             # 振子の角度をランダム化
-            scene["Limo"].set_joint_position_target(torch.tensor([[0.0,0.0,0.0,0.0,torch.rand().item()*180.0-90.0]]))
+            scene["Limo"].set_joint_position_target(torch.tensor([[0.0,0.0,0.0,0.0,torch.rand(1).item()*torch.pi-torch.pi/2.0]]))
 
             target_vel = torch.tensor([[0.0,0.0,0.0,0.0,0.0]])
             # reset the scene entities to their initial positions offset by the environment origins
