@@ -218,8 +218,6 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             learning_state = 0
             steps = 0
             episodes += 1
-            # print(f"[INFO]: episodes {episodes}")
-            print("[DEBUG]: degree_error",math.degrees(yaw_error))
 
         if steps % 20 == 0:
             print("[DEBUG]: pendulum ", torch.rad2deg(scene["Limo"].data.joint_pos[0,4]))
