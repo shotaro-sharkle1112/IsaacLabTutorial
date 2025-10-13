@@ -284,7 +284,7 @@ class LimoPendulumNoNoiseEnv(DirectRLEnv):
         axis_y = torch.tensor([0.0, 1.0, 0.0],device=self.limo.device)
         world_up = torch.tensor([0.0, 0.0, 1.0], device=self.limo.device)
         u0_up  = torch.tensor([0.0, 0.0, 1.0])
-        q_joint=math_utils.quat_from_angle_axis(self.limo.data.joint_pos[:,4])
+        q_joint=math_utils.quat_from_angle_axis(self.limo.data.joint_pos[:,4],axis_y)
         u_local = math_utils.quat_apply(q_joint, u0_up)               # (...,3)
         root_quat = self.limo.root_link_quat_w
         # 2) ワールドへ：u_world = R_root * u_local
