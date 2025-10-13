@@ -79,18 +79,6 @@ class LimoSceneCfg(InteractiveSceneCfg):
       ),
       init_state=RigidObjectCfg.InitialStateCfg(pos=(1.0, 0.0, 0.0)),
    )
-   ConeY = RigidObjectCfg(
-      prim_path="{ENV_REGEX_NS}/ConeY",
-      spawn=sim_utils.ConeCfg(
-         radius=0.1,
-         height=0.7,
-         rigid_props=sim_utils.RigidBodyPropertiesCfg(kinematic_enabled=True),
-         collision_props=sim_utils.CollisionPropertiesCfg(collision_enabled=False),
-         visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.0, 0.0, 1.0), metallic=0.2, opacity=0.5),
-      ),
-      init_state=RigidObjectCfg.InitialStateCfg(pos=(0.0, 1.0, 0.0)),
-   )
-
 
    Limo = LIMO_CFG.replace(
       prim_path="/World/envs/env_.*/Robot",
