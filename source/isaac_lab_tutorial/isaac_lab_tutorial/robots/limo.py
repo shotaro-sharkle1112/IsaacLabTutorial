@@ -26,6 +26,9 @@ LIMO_CFG = ArticulationCfg(
             stiffness=0.0, damping=0.0,   # 完全受動
         ),
     },
+    init_state=ArticulationCfg.InitialStateCfg(
+        pos=(0.0, 0.0, 0.2)
+    ),
 )
 
 LIMO_FRONT_CFG = ArticulationCfg(
