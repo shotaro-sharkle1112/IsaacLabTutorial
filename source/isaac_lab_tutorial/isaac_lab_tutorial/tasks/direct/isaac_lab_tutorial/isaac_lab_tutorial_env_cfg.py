@@ -51,7 +51,7 @@ class LimoEnvCfg(DirectRLEnvCfg):
     dof_names = ["front_left_wheel","front_right_wheel", "rear_left_wheel", "rear_right_wheel"]
 
 @configclass
-class LimoPengulumEnvCfg(DirectRLEnvCfg):
+class LimoPendulumEnvCfg(DirectRLEnvCfg):
     # env
     decimation = 2
     episode_length_s = 5.0

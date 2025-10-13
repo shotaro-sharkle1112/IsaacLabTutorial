@@ -13,7 +13,7 @@ import isaaclab.sim as sim_utils
 from isaaclab.assets import Articulation
 from isaaclab.envs import DirectRLEnv
 from isaaclab.sim.spawners.from_files import GroundPlaneCfg, spawn_ground_plane
-from .isaac_lab_tutorial_env_cfg import IsaacLabTutorialEnvCfg, LimoPengulumEnvCfg
+from .isaac_lab_tutorial_env_cfg import IsaacLabTutorialEnvCfg, LimoPendulumEnvCfg
 
 from isaaclab.markers import VisualizationMarkers, VisualizationMarkersCfg
 from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR
@@ -237,9 +237,9 @@ class IsaacLabTutorialEnvWithNoise02(IsaacLabTutorialEnv):
 
 
 class LimoPendulumNoNoiseEnv(DirectRLEnv):
-    cfg: LimoPengulumEnvCfg
+    cfg: LimoPendulumEnvCfg
 
-    def __init__(self, cfg: LimoPengulumEnvCfg, render_mode: str | None = None, **kwargs):
+    def __init__(self, cfg: LimoPendulumEnvCfg, render_mode: str | None = None, **kwargs):
         super().__init__(cfg, render_mode, **kwargs)
 
         self._cart_dof_idxs, _ = self.limo.find_joints(self.cfg.cart_dof_names)
