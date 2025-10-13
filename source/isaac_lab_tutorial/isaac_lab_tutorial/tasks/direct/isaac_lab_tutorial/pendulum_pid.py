@@ -206,8 +206,8 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
 
         if steps % 20 == 0:
             print("[DEBUG]: pendulum ", torch.rad2deg(scene["Limo"].data.joint_pos[0,4]).item())
-            print("[DEBUG]: pendulum ", scene["Limo"].data.root_link_pos_w[:, 0].item())
-            print("[DEBUG]: pendulum ", scene["Limo"].data.root_com_lin_vel_w[:, 0].item())
+            print("[DEBUG]: root x ", scene["Limo"].data.root_link_pos_w[:, 0].item())
+            print("[DEBUG]: root vel x ", scene["Limo"].data.root_com_lin_vel_w[:, 0].item())
 
         
         sim.step()
