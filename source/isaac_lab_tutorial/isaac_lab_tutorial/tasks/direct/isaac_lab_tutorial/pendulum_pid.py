@@ -206,8 +206,11 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
 
         if steps % 20 == 0:
             print("[DEBUG]: pendulum ", torch.rad2deg(scene["Limo"].data.joint_pos[0,4]).item())
-            print("[DEBUG]: root x ", scene["Limo"].data.root_link_pos_w[:, 0].item())
-            print("[DEBUG]: root vel x ", scene["Limo"].data.root_com_lin_vel_w[:, 0].item())
+            world_up = torch.tensor([0.0, 0.0, 1.0], device=scene.device)
+            quat = scene["Limo"].data.root_link_quat_w
+            up_dir = math_utils.quat_apply(quat, world_up.expand(quat.shape[0], -1))
+            flipped = up_dir[:, 2] < 0.0
+            print("[DUBUG]: flipped",flipped)
 
         
         sim.step()
