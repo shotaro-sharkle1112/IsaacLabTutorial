@@ -27,7 +27,7 @@ LIMO_CFG = ArticulationCfg(
         ),
     },
     init_state=ArticulationCfg.InitialStateCfg(
-        pos=(0.0, 0.0, 0.2)
+        pos=(0.0, 0.0, 0.1)
     ),
 )
 

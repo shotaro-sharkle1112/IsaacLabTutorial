@@ -262,11 +262,7 @@ class LimoPendulumNoNoiseEnv(DirectRLEnv):
         light_cfg.func("/World/Light", light_cfg)
 
     def _pre_physics_step(self, actions: torch.Tensor) -> None:
-        N = self.cfg.scene.num_envs
-        device, dtype = actions.device, actions.dtype
-        limo_actions = torch.zeros((N, 4), device=device, dtype=dtype)
-        limo_actions[:, :] = actions.clone()
-        self.actions = self.action_scale * limo_actions
+        self.actions = (self.action_scale * actions).expand(-1, 4).clone()
 
     def _apply_action(self) -> None:
         self.limo.set_joint_effort_target(self.actions, joint_ids=self._cart_dof_idxs)
