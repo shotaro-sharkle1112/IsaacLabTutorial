@@ -265,7 +265,7 @@ class LimoPendulumNoNoiseEnv(DirectRLEnv):
         self.actions = (self.action_scale * actions).expand(-1, 4).clone()
 
     def _apply_action(self) -> None:
-        self.limo.set_joint_effort_target(self.actions, joint_ids=self._cart_dof_idxs)
+        self.limo.set_joint_velocity_target(self.actions, joint_ids=self._cart_dof_idxs)
 
     def _get_observations(self) -> dict:
         obs = torch.cat(
