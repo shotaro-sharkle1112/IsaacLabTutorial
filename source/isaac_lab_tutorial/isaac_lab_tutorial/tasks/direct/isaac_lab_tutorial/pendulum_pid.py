@@ -206,11 +206,28 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
 
         if steps % 20 == 0:
             print("[DEBUG]: pendulum ", torch.rad2deg(scene["Limo"].data.joint_pos[0,4]).item())
-            world_up = torch.tensor([0.0, 0.0, 1.0], device=scene.device)
-            quat = scene["Limo"].data.root_link_quat_w
-            up_dir = math_utils.quat_apply(quat, world_up.expand(quat.shape[0], -1))
-            flipped = up_dir[:, 2] < 0.0
-            print("[DUBUG]: flipped",flipped)
+            axis_y = torch.tensor([0.0, 1.0, 0.0],device=scene["Limo"].device)
+            world_up = torch.tensor([0.0, 0.0, 1.0], device=scene["Limo"].device)
+            u0_up  = torch.tensor([0.0, 0.0, 1.0])
+            q_joint=math_utils.quat_from_angle_axis(scene["Limo"].data.joint_pos[:,4])
+            u_local = math_utils.quat_apply(q_joint, u0_up)               # (...,3)
+            root_quat = scene["Limo"].root_link_quat_w
+            # 2) ワールドへ：u_world = R_root * u_local
+            u_world = math_utils.quat_apply(root_quat, u_local)           # (...,3)
+
+            # 3) 世界の上向きと角度
+            u_world = math_utils.normalize(u_world)
+            up = math_utils.normalize(world_up)
+
+            dot = (u_world * up).sum(dim=-1)                   # (...,)
+            dot = torch.clamp(dot, -1.0, 1.0)
+            cross_n = torch.linalg.norm(torch.cross(u_world, up, dim=-1), dim=-1)
+            phi = torch.atan2(cross_n, dot)
+
+            axis_world = math_utils.quat_apply(root_quat, axis_y)         # (...,3)
+            s = torch.sign((axis_world * torch.cross(up, u_world, dim=-1)).sum(dim=-1))
+            s = torch.where(s == 0, torch.tensor(1.0, device=scene["Limo"].device), s)
+            print("[DUBUG]: pole",math_utils.wrap_to_pi(s*phi))
 
         
         sim.step()
