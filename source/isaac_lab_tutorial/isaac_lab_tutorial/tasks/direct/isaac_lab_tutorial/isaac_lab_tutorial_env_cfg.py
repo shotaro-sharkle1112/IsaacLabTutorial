@@ -66,7 +66,7 @@ class LimoPendulumEnvCfg(DirectRLEnvCfg):
     # robot(s)
     robot_cfg: ArticulationCfg = LIMO_CFG.replace(prim_path="/World/envs/env_.*/Robot")
     # scene
-    scene: InteractiveSceneCfg = InteractiveSceneCfg(num_envs=4096, env_spacing=4.0, replicate_physics=True)
+    scene: InteractiveSceneCfg = InteractiveSceneCfg(num_envs=100, env_spacing=4.0, replicate_physics=True)
     cart_dof_names = ["front_left_wheel","front_right_wheel", "rear_left_wheel", "rear_right_wheel"]
     pole_dof_name = ["pendulum"]
 
