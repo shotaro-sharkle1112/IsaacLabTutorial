@@ -263,6 +263,7 @@ class LimoPendulumNoNoiseEnv(DirectRLEnv):
 
     def _pre_physics_step(self, actions: torch.Tensor) -> None:
         self.actions = (self.action_scale * actions).expand(-1, 4).clone()
+        print("[DEBUG]:env0 action",actions[0])
 
     def _apply_action(self) -> None:
         self.limo.set_joint_velocity_target(self.actions, joint_ids=self._cart_dof_idxs)
@@ -278,6 +279,7 @@ class LimoPendulumNoNoiseEnv(DirectRLEnv):
             dim=-1,
         )
         observations = {"policy": obs}
+        print("[DEBUG]:env0 obs",self.joint_pos[0, self._pole_dof_idx[0]], self.joint_vel[0, self._pole_dof_idx[0]], self.limo.data.root_link_pos_w[0, 0], self.limo.data.root_com_lin_vel_w[0, 0])
         return observations
 
     def _get_rewards(self) -> torch.Tensor:
