@@ -7,5 +7,9 @@ sess = ort.InferenceSession("policy.onnx", providers=["CPUExecutionProvider"])
 in_name  = sess.get_inputs()[0].name
 out_names = [o.name for o in sess.get_outputs()]
 
-print("in_name",in_name)
-print("out_name",out_names)
+print("Inputs:")
+for i, inp in enumerate(sess.get_inputs()):
+    print(i, inp.name, inp.shape, inp.type)
+print("Outputs:")
+for i, out in enumerate(sess.get_outputs()):
+    print(i, out.name, out.shape, out.type)
