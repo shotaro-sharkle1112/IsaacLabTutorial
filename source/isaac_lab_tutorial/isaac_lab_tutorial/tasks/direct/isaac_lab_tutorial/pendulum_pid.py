@@ -128,6 +128,8 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
 
         if learning_state == 0: # reset
             
+            # 重さを変えてみる
+            # sim_utils.schemas.modify_mass_properties(prim_path="/World/envs/env_.*/Robot",)
 
             target_vel = torch.tensor([[0.0,0.0,0.0,0.0,0.0]])
             # reset the scene entities to their initial positions offset by the environment origins
