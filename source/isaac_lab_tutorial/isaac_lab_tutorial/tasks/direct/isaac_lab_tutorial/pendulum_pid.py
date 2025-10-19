@@ -127,6 +127,8 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     while simulation_app.is_running():
 
         if learning_state == 0: # reset
+
+
             
             # 重さを変えてみる
             # sim_utils.schemas.modify_mass_properties(prim_path="/World/envs/env_.*/Robot",)
@@ -213,6 +215,8 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             up_dir = math_utils.quat_apply(quat, world_up.expand(quat.shape[0], -1))
             flipped = up_dir[:, 2] < 0.0
             print("[DUBUG]: flipped",flipped)
+
+            print("[DUBUG]: joints",scene["Limo"].find_joints(".*"))
 
         
         sim.step()
