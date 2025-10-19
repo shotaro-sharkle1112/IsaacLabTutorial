@@ -27,6 +27,7 @@ parser.add_argument("--d", type=float, default=0.0, help="Number of environments
 parser.add_argument("--std_deg", type=float, default=0.0, help="Number of environments to spawn.")
 parser.add_argument("--area", type=float, default=0.0, help="Number of environments to spawn.")
 parser.add_argument("--kv", type=float, default=0.0, help="Number of environments to spawn.")
+parser.add_argument("--mass", type=float, default=1.0, help="Number of environments to spawn.")
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
 # parse the arguments
@@ -131,7 +132,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
 
             
             # 重さを変えてみる
-            sim_utils.schemas.modify_mass_properties(prim_path="/World/envs/env_.*/Robot/weight_link",cfg=sim_utils.schemas.MassPropertiesCfg(mass=100.0))
+            
 
             target_vel = torch.tensor([[0.0,0.0,0.0,0.0,0.0]])
             # reset the scene entities to their initial positions offset by the environment origins
@@ -156,6 +157,8 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             scene["Limo"].write_joint_state_to_sim(joint_pos, joint_vel)
             # clear internal buffers
             scene.reset()
+
+            sim_utils.schemas.modify_mass_properties(prim_path="/World/envs/env_.*/Robot/weight_link",cfg=sim_utils.schemas.MassPropertiesCfg(mass=args_cli.mass))
 
             integral_error = 0.0
             derivative_error = 0.0
