@@ -158,7 +158,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             # clear internal buffers
             scene.reset()
 
-            sim_utils.schemas.modify_mass_properties(prim_path="/World/envs/env_.*/Robot/weight_link",cfg=sim_utils.schemas.MassPropertiesCfg(mass=args_cli.mass))
+            #sim_utils.schemas.modify_mass_properties(prim_path="/World/envs/env_.*/Robot/weight_link",cfg=sim_utils.schemas.MassPropertiesCfg(mass=args_cli.mass))
 
             integral_error = 0.0
             derivative_error = 0.0
