@@ -13,6 +13,7 @@ import isaaclab.sim as sim_utils
 from isaaclab.assets import Articulation
 from isaaclab.envs import DirectRLEnv
 from isaaclab.sim.spawners.from_files import GroundPlaneCfg, spawn_ground_plane
+from isaaclab.sim.spawners.materials import RigidBodyMaterialCfg
 from .isaac_lab_tutorial_env_cfg import IsaacLabTutorialEnvCfg, LimoPendulumEnvCfg
 
 from isaaclab.markers import VisualizationMarkers, VisualizationMarkersCfg
@@ -50,7 +51,7 @@ class IsaacLabTutorialEnv(DirectRLEnv):
         
         self.robot = Articulation(self.cfg.robot_cfg)
         # add ground plane
-        spawn_ground_plane(prim_path="/World/ground", cfg=GroundPlaneCfg())
+        spawn_ground_plane(prim_path="/World/ground", cfg=GroundPlaneCfg(physics_material=RigidBodyMaterialCfg(static_friction=0.73,dynamic_friction=0.5)))
         # clone and replicate
         self.scene.clone_environments(copy_from_source=False)
         # add articulation to scene
