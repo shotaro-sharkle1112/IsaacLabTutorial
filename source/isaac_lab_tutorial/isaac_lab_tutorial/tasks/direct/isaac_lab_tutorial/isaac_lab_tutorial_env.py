@@ -295,7 +295,7 @@ class LimoPendulumNoNoiseEnv(DirectRLEnv):
             self.limo.data.root_com_lin_vel_w[:, 0],
             self.reset_terminated,
         )
-        print("[DEBUG]: env 0 x",self.limo.data.root_link_pos_w[0, 0])
+        print("[DEBUG]: env 0 x",self.limo.data.root_link_pos_w[0, 0] - self.limo.data.default_root_state[0, 0])
         return total_reward
 
     def _get_dones(self) -> tuple[torch.Tensor, torch.Tensor]:
@@ -368,5 +368,5 @@ def compute_rewards(
     rew_pole_vel = rew_scale_pole_vel * torch.sum(torch.abs(pole_vel).unsqueeze(dim=1), dim=-1)
     rew_cart_pos = rew_scale_cart_pos * torch.sum(torch.abs(cart_pos).unsqueeze(dim=1), dim=-1)
     rew_cart_vel = rew_scale_cart_vel * torch.sum(torch.abs(cart_vel).unsqueeze(dim=1), dim=-1)
-    total_reward = rew_alive + rew_termination + rew_pole_pos + rew_cart_vel + rew_pole_vel
+    total_reward = rew_alive + rew_termination + rew_pole_pos + rew_cart_pos + rew_cart_vel + rew_pole_vel
     return total_reward
