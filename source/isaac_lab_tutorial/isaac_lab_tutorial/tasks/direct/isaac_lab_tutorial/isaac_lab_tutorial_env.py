@@ -341,7 +341,6 @@ class LimoPendulumNoNoiseEnv(DirectRLEnv):
         # 各環境の重さのランダマイズ
         for i in env_ids:
             m = sample_uniform(self.cfg.weight_range[0],self.cfg.weight_range[1],1,joint_pos.device).item()
-            print("[DEBUG]:mass radomization",i,"mass", m)
             sim_utils.schemas.modify_mass_properties(
                 prim_path=f"/World/envs/env_{i}/Robot/weight_link",
                 cfg=sim_utils.schemas.MassPropertiesCfg(mass=m)
