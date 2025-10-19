@@ -293,11 +293,9 @@ class LimoPendulumNoNoiseEnv(DirectRLEnv):
             self.joint_vel[:, self._pole_dof_idx[0]],
             self.limo.data.root_link_pos_w[:, 0],
             self.limo.data.root_com_lin_vel_w[:, 0],
+            self.limo.data.root_link_pos_w[:, 0] - self.scene.env_origins[:,0],
             self.reset_terminated,
         )
-        print("[DEBUG]: env 0 default x",self.scene.env_origins[0,0])
-        print("[DEBUG]: env 0 root link x",self.limo.data.root_link_pos_w[0, 0])
-        print("[DEBUG]: env 0 move x",self.limo.data.root_link_pos_w[0, 0] - self.scene.env_origins[0,0])
         return total_reward
 
     def _get_dones(self) -> tuple[torch.Tensor, torch.Tensor]:
