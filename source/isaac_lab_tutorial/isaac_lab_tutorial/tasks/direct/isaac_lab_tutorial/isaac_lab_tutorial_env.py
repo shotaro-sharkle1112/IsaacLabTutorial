@@ -286,14 +286,16 @@ class LimoPendulumNoNoiseEnv(DirectRLEnv):
             self.cfg.rew_scale_alive,
             self.cfg.rew_scale_terminated,
             self.cfg.rew_scale_pole_pos,
-            self.cfg.rew_scale_cart_vel,
             self.cfg.rew_scale_pole_vel,
+            self.cfg.rew_scale_cart_pos,
+            self.cfg.rew_scale_cart_vel,
             self.joint_pos[:, self._pole_dof_idx[0]],
             self.joint_vel[:, self._pole_dof_idx[0]],
             self.limo.data.root_link_pos_w[:, 0],
             self.limo.data.root_com_lin_vel_w[:, 0],
             self.reset_terminated,
         )
+        print("[DEBUG]: env 0 x",self.limo.data.root_link_pos_w[0, 0])
         return total_reward
 
     def _get_dones(self) -> tuple[torch.Tensor, torch.Tensor]:
@@ -352,8 +354,9 @@ def compute_rewards(
     rew_scale_alive: float,
     rew_scale_terminated: float,
     rew_scale_pole_pos: float,
-    rew_scale_cart_vel: float,
     rew_scale_pole_vel: float,
+    rew_scale_cart_pos: float,
+    rew_scale_cart_vel: float,
     pole_pos: torch.Tensor,
     pole_vel: torch.Tensor,
     cart_pos: torch.Tensor,
@@ -363,7 +366,8 @@ def compute_rewards(
     rew_alive = rew_scale_alive * (1.0 - reset_terminated.float())
     rew_termination = rew_scale_terminated * reset_terminated.float()
     rew_pole_pos = rew_scale_pole_pos * torch.sum(torch.square(pole_pos).unsqueeze(dim=1), dim=-1)
-    rew_cart_vel = rew_scale_cart_vel * torch.sum(torch.abs(cart_vel).unsqueeze(dim=1), dim=-1)
     rew_pole_vel = rew_scale_pole_vel * torch.sum(torch.abs(pole_vel).unsqueeze(dim=1), dim=-1)
+    rew_cart_pos = rew_scale_cart_pos * torch.sum(torch.abs(cart_pos).unsqueeze(dim=1), dim=-1)
+    rew_cart_vel = rew_scale_cart_vel * torch.sum(torch.abs(cart_vel).unsqueeze(dim=1), dim=-1)
     total_reward = rew_alive + rew_termination + rew_pole_pos + rew_cart_vel + rew_pole_vel
     return total_reward
