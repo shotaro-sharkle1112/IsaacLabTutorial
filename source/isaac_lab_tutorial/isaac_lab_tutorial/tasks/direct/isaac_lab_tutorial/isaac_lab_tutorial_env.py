@@ -291,9 +291,8 @@ class LimoPendulumNoNoiseEnv(DirectRLEnv):
             self.cfg.rew_scale_cart_vel,
             self.joint_pos[:, self._pole_dof_idx[0]],
             self.joint_vel[:, self._pole_dof_idx[0]],
-            self.limo.data.root_link_pos_w[:, 0],
-            self.limo.data.root_com_lin_vel_w[:, 0],
             self.limo.data.root_link_pos_w[:, 0] - self.scene.env_origins[:,0],
+            self.limo.data.root_com_lin_vel_w[:, 0],
             self.reset_terminated,
         )
         return total_reward
