@@ -131,7 +131,7 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
 
             
             # 重さを変えてみる
-            # sim_utils.schemas.modify_mass_properties(prim_path="/World/envs/env_.*/Robot",)
+            sim_utils.schemas.modify_mass_properties(prim_path="/World/envs/env_.*/Robot/weight_link",cfg=sim_utils.schemas.MassPropertiesCfg(mass=100.0))
 
             target_vel = torch.tensor([[0.0,0.0,0.0,0.0,0.0]])
             # reset the scene entities to their initial positions offset by the environment origins
