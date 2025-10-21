@@ -71,8 +71,8 @@ class LimoPendulumEnvCfg(DirectRLEnvCfg):
     pole_dof_name = ["pendulum"]
 
     max_cart_pos = 3.0  # the cart is reset if it exceeds that position [m]
-    initial_pole_angle_range = [-0.1, 0.1]  # the range in which the pole angle is sampled from on reset [rad]
-    weight_range = [0.1, 0.3]
+    initial_pole_angle_range = [0.0, 0.0]  # the range in which the pole angle is sampled from on reset [rad]
+    weight_range = [0.2, 0.2]
     # reward scales
     rew_scale_alive = 1.0
     rew_scale_terminated = -2.0
