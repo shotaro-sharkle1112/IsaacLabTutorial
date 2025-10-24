@@ -345,6 +345,22 @@ class LimoPendulumNoNoiseEnv(DirectRLEnv):
                 cfg=sim_utils.schemas.MassPropertiesCfg(mass=m)
                 )
 
+class LimoPendulumNoNoiseEnv2(LimoPendulumNoNoiseEnv):
+    def _get_rewards(self) -> torch.Tensor:
+        total_reward = compute_rewards2(
+            self.cfg.rew_scale_alive,
+            self.cfg.rew_scale_terminated,
+            self.cfg.rew_scale_pole_pos,
+            self.cfg.rew_scale_pole_vel,
+            self.cfg.rew_scale_cart_pos,
+            self.cfg.rew_scale_cart_vel,
+            self.joint_pos[:, self._pole_dof_idx[0]],
+            self.joint_vel[:, self._pole_dof_idx[0]],
+            self.limo.data.root_link_pos_w[:, 0] - self.scene.env_origins[:,0],
+            self.limo.data.root_com_lin_vel_w[:, 0],
+            self.reset_terminated,
+        )
+        return total_reward
 
 
 @torch.jit.script
