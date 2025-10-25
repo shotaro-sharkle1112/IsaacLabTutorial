@@ -6,8 +6,6 @@ cd /d "%~dp0"
 
 
 
-python scripts\rsl_rl\train.py --task Limo-Pendulum-NoNoise --max_iterations 2000 --load_run 2025-10-24_22-32-19 --checkpoint model_4750.pt --resume --headless --video
-
 echo [1/3] Running Limo-Pendulum-NoNoise-R2-64...
 python scripts\rsl_rl\train.py --task Limo-Pendulum-NoNoise-R2-64 --max_iterations 5000 --headless --video
 
