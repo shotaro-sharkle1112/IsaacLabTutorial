@@ -401,7 +401,7 @@ def compute_rewards2(
     reset_terminated: torch.Tensor,
 ):
     rew_termination = rew_scale_terminated * reset_terminated.float()
-    rew_pole_pos = 1 - torch.exp(rew_scale_pole_pos * torch.sum(torch.square(pole_pos).unsqueeze(dim=1), dim=-1))
+    rew_pole_pos = torch.exp(rew_scale_pole_pos * torch.sum(torch.square(pole_pos).unsqueeze(dim=1), dim=-1))
     rew_pole_vel = rew_scale_pole_vel * torch.sum(torch.square(pole_vel).unsqueeze(dim=1), dim=-1)
     rew_cart_pos = rew_scale_cart_pos * torch.sum(torch.square(cart_pos).unsqueeze(dim=1), dim=-1)
     rew_cart_vel = rew_scale_cart_vel * torch.sum(torch.square(cart_vel).unsqueeze(dim=1), dim=-1)
