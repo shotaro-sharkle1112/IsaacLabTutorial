@@ -152,6 +152,6 @@ gym.register(
         "env_cfg_entry_point": f"{__name__}.isaac_lab_tutorial_env_cfg:LimoPendulumEnvCfg",
         "skrl_amp_cfg_entry_point": f"{agents.__name__}:skrl_amp_cfg.yaml",
         "skrl_cfg_entry_point": f"{agents.__name__}:skrl_ppo_limo_pendulum_cfg.yaml",
-        "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:PPORunnerCfg32-16",
+        "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:PPORunnerCfg32_16",
     },
 )

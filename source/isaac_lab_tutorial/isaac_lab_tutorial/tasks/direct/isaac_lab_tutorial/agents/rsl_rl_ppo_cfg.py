@@ -93,7 +93,7 @@ class PPORunnerCfg128(RslRlOnPolicyRunnerCfg):
     )
 
 @configclass
-class PPORunnerCfg128(RslRlOnPolicyRunnerCfg):
+class PPORunnerCfg32_16(RslRlOnPolicyRunnerCfg):
     num_steps_per_env = 128
     max_iterations = 1500
     save_interval = 50
