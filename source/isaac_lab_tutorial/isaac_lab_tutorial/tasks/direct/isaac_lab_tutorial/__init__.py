@@ -143,3 +143,15 @@ gym.register(
         "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:PPORunnerCfg128",
     },
 )
+
+gym.register(
+    id="Limo-Pendulum-NoNoise-R2-32-16",
+    entry_point=f"{__name__}.isaac_lab_tutorial_env:LimoPendulumNoNoiseEnv2",
+    disable_env_checker=True,
+    kwargs={
+        "env_cfg_entry_point": f"{__name__}.isaac_lab_tutorial_env_cfg:LimoPendulumEnvCfg",
+        "skrl_amp_cfg_entry_point": f"{agents.__name__}:skrl_amp_cfg.yaml",
+        "skrl_cfg_entry_point": f"{agents.__name__}:skrl_ppo_limo_pendulum_cfg.yaml",
+        "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:PPORunnerCfg32-16",
+    },
+)
