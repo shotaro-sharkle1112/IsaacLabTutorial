@@ -79,7 +79,8 @@ class LimoPendulumEnvCfg(DirectRLEnvCfg):
     rew_scale_pole_pos = -1.0
     rew_scale_pole_vel = -0.005
     rew_scale_cart_vel = -0.01
-    rew_scale_cart_pos = -0.5
+    rew_scale_cart_pos = -0.8
+    
 
 @configclass
 class LimoPendulumEnvCfgC10s(DirectRLEnvCfg):
