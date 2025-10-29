@@ -51,7 +51,7 @@ class IsaacLabTutorialEnv(DirectRLEnv):
         
         self.robot = Articulation(self.cfg.robot_cfg)
         # add ground plane
-        spawn_ground_plane(prim_path="/World/ground", cfg=GroundPlaneCfg(physics_material=RigidBodyMaterialCfg(static_friction=0.73,dynamic_friction=0.5)))
+        spawn_ground_plane(prim_path="/World/ground", cfg=GroundPlaneCfg(physics_material=RigidBodyMaterialCfg(static_friction=1.08,dynamic_friction=1.08)))
         # clone and replicate
         self.scene.clone_environments(copy_from_source=False)
         # add articulation to scene
