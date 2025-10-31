@@ -14,7 +14,7 @@ class LimoOnnxController:
         rospy.init_node("limo_onnx_controller")
 
         # ===== パラメータ =====
-        self.model_path = rospy.get_param("~model_path", "/home/agilex/models/limo_ctrl.onnx")
+        self.model_path = rospy.get_param("~model_path", "/home/agilex/agilex_ws/src/onnx_controler/scripts/policy.onnx")
         # ONNXの入力名（モデルによって違う。分からなければ print(session.get_inputs()) で確認）
         self.input_names = rospy.get_param("~input_names",
                                            ["pend_angle", "pend_angvel", "x_pos", "x_vel"])
