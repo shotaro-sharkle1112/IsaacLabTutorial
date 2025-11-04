@@ -125,7 +125,7 @@ class PPORunnerCfg16_16(RslRlOnPolicyRunnerCfg):
     num_steps_per_env = 128
     max_iterations = 1500
     save_interval = 50
-    experiment_name = "Limo-Pendulum"
+    experiment_name = "limo-Pendulum"
     empirical_normalization = False
     policy = RslRlPpoActorCriticCfg(
         init_noise_std=1.0,
