@@ -20,6 +20,10 @@ params:
       initializer:
         name: default
     log_std_bounds: [-5, 2]
+  
+  env:
+    clip_actions: 1.0
+    clip_observations: 5.0
 
   load_checkpoint: False
   load_path: nn/Ant.pth
