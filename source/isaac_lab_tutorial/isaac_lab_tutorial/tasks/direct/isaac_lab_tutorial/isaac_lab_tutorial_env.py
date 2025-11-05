@@ -440,7 +440,7 @@ class LimoPendulumNoNoiseEnv2RLGames(DirectRLEnv):
     def _apply_action(self) -> None:
         self.limo.set_joint_velocity_target(self.actions, joint_ids=self._cart_dof_idxs)
 
-    def _get_observations(self) -> torch.Tensor:
+    def _get_observations(self) -> dict:
         obs = torch.cat(
             (
                 self.joint_pos[:, self._pole_dof_idx[0]].unsqueeze(dim=1),
@@ -451,7 +451,7 @@ class LimoPendulumNoNoiseEnv2RLGames(DirectRLEnv):
             dim=-1,
         )
         observations = {"policy": obs}
-        return observations["policy"]
+        return observations
 
     def _get_rewards(self) -> torch.Tensor:
         total_reward = compute_rewards2(
