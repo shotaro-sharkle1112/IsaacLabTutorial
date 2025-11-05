@@ -47,3 +47,4 @@ params:
     num_warmup_steps: 10
     replay_buffer_size: 1000000
     num_actors: 100
+    device: "cuda:0"
