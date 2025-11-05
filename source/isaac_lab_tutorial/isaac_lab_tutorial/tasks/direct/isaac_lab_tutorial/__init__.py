@@ -158,6 +158,17 @@ gym.register(
 )
 
 gym.register(
+    id="Limo-Pendulum-NoNoise-R2-32-16-SAC",
+    entry_point=f"{__name__}.isaac_lab_tutorial_env:LimoPendulumNoNoiseEnv2RLGames",
+    disable_env_checker=True,
+    kwargs={
+        "env_cfg_entry_point": f"{__name__}.isaac_lab_tutorial_env_cfg:LimoPendulumEnvCfg",
+        "rl_games_cfg_entry_point": f"{agents.__name__}:rl_games_sac_cfg.yaml",
+    },
+)
+
+
+gym.register(
     id="Limo-Pendulum-NoNoise-R2-32-16-C10s",
     entry_point=f"{__name__}.isaac_lab_tutorial_env:LimoPendulumNoNoiseEnv2",
     disable_env_checker=True,

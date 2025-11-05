@@ -407,3 +407,112 @@ def compute_rewards2(
     rew_cart_vel = rew_scale_cart_vel * torch.sum(torch.square(cart_vel).unsqueeze(dim=1), dim=-1)
     total_reward = rew_termination + rew_pole_pos + rew_cart_pos + rew_cart_vel + rew_pole_vel
     return total_reward
+
+
+class LimoPendulumNoNoiseEnv2RLGames(DirectRLEnv):
+    cfg: LimoPendulumEnvCfg
+
+    def __init__(self, cfg: LimoPendulumEnvCfg, render_mode: str | None = None, **kwargs):
+        super().__init__(cfg, render_mode, **kwargs)
+
+        self._cart_dof_idxs, _ = self.limo.find_joints(self.cfg.cart_dof_names)
+        self._pole_dof_idx, _ = self.limo.find_joints(self.cfg.pole_dof_name)
+        self.action_scale = self.cfg.action_scale
+
+        self.joint_pos = self.limo.data.joint_pos
+        self.joint_vel = self.limo.data.joint_vel
+
+    def _setup_scene(self):
+        self.limo = Articulation(self.cfg.robot_cfg)
+        # add ground plane
+        spawn_ground_plane(prim_path="/World/ground", cfg=GroundPlaneCfg())
+        # clone and replicate
+        self.scene.clone_environments(copy_from_source=False)
+        # add articulation to scene
+        self.scene.articulations["limo"] = self.limo
+        # add lights
+        light_cfg = sim_utils.DomeLightCfg(intensity=2000.0, color=(0.75, 0.75, 0.75))
+        light_cfg.func("/World/Light", light_cfg)
+
+    def _pre_physics_step(self, actions: torch.Tensor) -> None:
+        self.actions = (self.action_scale * actions).expand(-1, 4).clone()
+
+    def _apply_action(self) -> None:
+        self.limo.set_joint_velocity_target(self.actions, joint_ids=self._cart_dof_idxs)
+
+    def _get_observations(self) -> torch.Tensor:
+        obs = torch.cat(
+            (
+                self.joint_pos[:, self._pole_dof_idx[0]].unsqueeze(dim=1),
+                self.joint_vel[:, self._pole_dof_idx[0]].unsqueeze(dim=1),
+                self.limo.data.root_link_pos_w[:, 0].unsqueeze(dim=1),
+                self.limo.data.root_com_lin_vel_w[:, 0].unsqueeze(dim=1),
+            ),
+            dim=-1,
+        )
+        observations = {"policy": obs}
+        return observations["policy"]
+
+    def _get_rewards(self) -> torch.Tensor:
+        total_reward = compute_rewards2(
+            self.cfg.rew_scale_alive,
+            self.cfg.rew_scale_terminated,
+            self.cfg.rew_scale_pole_pos,
+            self.cfg.rew_scale_pole_vel,
+            self.cfg.rew_scale_cart_pos,
+            self.cfg.rew_scale_cart_vel,
+            self.joint_pos[:, self._pole_dof_idx[0]],
+            self.joint_vel[:, self._pole_dof_idx[0]],
+            self.limo.data.root_link_pos_w[:, 0] - self.scene.env_origins[:,0],
+            self.limo.data.root_com_lin_vel_w[:, 0],
+            self.reset_terminated,
+        )
+        return total_reward
+
+    def _get_dones(self) -> tuple[torch.Tensor, torch.Tensor]:
+        self.joint_pos = self.limo.data.joint_pos
+        self.joint_vel = self.limo.data.joint_vel
+
+        time_out = self.episode_length_buf >= self.max_episode_length - 1
+        # 現在の座標とenv_state.originsを引いてどれだけ座標がずれたかを調べる
+        dists = torch.norm(self.limo.data.root_link_pos_w - (self.limo.data.default_root_state[:, :3]+self.scene.env_origins),dim=1)
+        out_of_bounds = dists > self.cfg.max_cart_pos
+        out_of_bounds = out_of_bounds | torch.any(torch.abs(self.joint_pos[:, self._pole_dof_idx]) > math.pi / 2, dim=1)
+        world_up = torch.tensor([0.0, 0.0, 1.0], device=self.limo.device)
+        quat = self.limo.data.root_link_quat_w
+        up_dir = math_utils.quat_apply(quat, world_up.expand(quat.shape[0], -1))
+        flipped = up_dir[:, 2] < 0.9
+        out_of_bounds = out_of_bounds | flipped
+        return out_of_bounds, time_out
+
+    def _reset_idx(self, env_ids: Sequence[int] | None):
+        if env_ids is None:
+            env_ids = self.limo._ALL_INDICES
+        super()._reset_idx(env_ids)
+
+        joint_pos = self.limo.data.default_joint_pos[env_ids]
+        joint_pos[:, self._pole_dof_idx] += sample_uniform(
+            self.cfg.initial_pole_angle_range[0] * math.pi,
+            self.cfg.initial_pole_angle_range[1] * math.pi,
+            joint_pos[:, self._pole_dof_idx].shape,
+            joint_pos.device,
+        )
+        joint_vel = self.limo.data.default_joint_vel[env_ids]
+
+        default_root_state = self.limo.data.default_root_state[env_ids]
+        default_root_state[:, :3] += self.scene.env_origins[env_ids]
+
+        self.joint_pos[env_ids] = joint_pos
+        self.joint_vel[env_ids] = joint_vel
+
+        self.limo.write_root_pose_to_sim(default_root_state[:, :7], env_ids)
+        self.limo.write_root_velocity_to_sim(default_root_state[:, 7:], env_ids)
+        self.limo.write_joint_state_to_sim(joint_pos, joint_vel, None, env_ids)
+
+        # 各環境の重さのランダマイズ
+        for i in env_ids:
+            m = sample_uniform(self.cfg.weight_range[0],self.cfg.weight_range[1],1,joint_pos.device).item()
+            sim_utils.schemas.modify_mass_properties(
+                prim_path=f"/World/envs/env_{i}/Robot/weight_link",
+                cfg=sim_utils.schemas.MassPropertiesCfg(mass=m)
+                )
