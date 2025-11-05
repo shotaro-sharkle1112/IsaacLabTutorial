@@ -153,6 +153,7 @@ gym.register(
         "skrl_amp_cfg_entry_point": f"{agents.__name__}:skrl_amp_cfg.yaml",
         "skrl_cfg_entry_point": f"{agents.__name__}:skrl_ppo_limo_pendulum_cfg.yaml",
         "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:PPORunnerCfg32_16",
+        "rl_games_cfg_entry_point": f"{agents.__name__}:rl_games_sac_cfg.yaml",
     },
 )
 
