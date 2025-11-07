@@ -21,7 +21,7 @@ params:
 
   config:
     name: limo-pendulum
-    env_name: brax
+    env_name: rlgpu
     normalize_input: True
     reward_shaper:
       scale_value: 1
