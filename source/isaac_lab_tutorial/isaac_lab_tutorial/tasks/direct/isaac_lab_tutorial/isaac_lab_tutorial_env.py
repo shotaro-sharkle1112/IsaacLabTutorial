@@ -273,12 +273,13 @@ class LimoPendulumNoNoiseEnv(DirectRLEnv):
             (
                 self.joint_pos[:, self._pole_dof_idx[0]].unsqueeze(dim=1),
                 self.joint_vel[:, self._pole_dof_idx[0]].unsqueeze(dim=1),
-                self.limo.data.root_link_pos_w[:, 0].unsqueeze(dim=1),
+                (self.limo.data.root_link_pos_w[:, 0] - self.scene.env_origins[:,0]).unsqueeze(dim=1),
                 self.limo.data.root_com_lin_vel_w[:, 0].unsqueeze(dim=1),
             ),
             dim=-1,
         )
         observations = {"policy": obs}
+        print("[DEBUG]:obs",obs[0])
         return observations
 
     def _get_rewards(self) -> torch.Tensor:
@@ -445,7 +446,7 @@ class LimoPendulumNoNoiseEnv2RLGames(DirectRLEnv):
             (
                 self.joint_pos[:, self._pole_dof_idx[0]].unsqueeze(dim=1),
                 self.joint_vel[:, self._pole_dof_idx[0]].unsqueeze(dim=1),
-                self.limo.data.root_link_pos_w[:, 0].unsqueeze(dim=1),
+                (self.limo.data.root_link_pos_w[:, 0] - self.scene.env_origins[:,0]).unsqueeze(dim=1),
                 self.limo.data.root_com_lin_vel_w[:, 0].unsqueeze(dim=1),
             ),
             dim=-1,

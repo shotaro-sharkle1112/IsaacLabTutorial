@@ -45,4 +45,6 @@ params:
     env_config:
       env_name: ant
 
-    env: {}
+  env:
+    clip_actions: 1.0
+    clip_observations: 2.0
