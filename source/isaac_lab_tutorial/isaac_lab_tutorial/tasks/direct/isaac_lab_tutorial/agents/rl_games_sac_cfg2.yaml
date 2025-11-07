@@ -1,4 +1,5 @@
 params:  
+  seed: 42
   algo:
     name: sac
 
