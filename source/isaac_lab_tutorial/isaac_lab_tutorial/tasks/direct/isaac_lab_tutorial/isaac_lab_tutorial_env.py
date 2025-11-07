@@ -306,7 +306,7 @@ class LimoPendulumNoNoiseEnv(DirectRLEnv):
         # 現在の座標とenv_state.originsを引いてどれだけ座標がずれたかを調べる
         dists = torch.norm(self.limo.data.root_link_pos_w - (self.limo.data.default_root_state[:, :3]+self.scene.env_origins),dim=1)
         out_of_bounds = dists > self.cfg.max_cart_pos
-        out_of_bounds = out_of_bounds | torch.any(torch.abs(self.joint_pos[:, self._pole_dof_idx]) > math.pi / 2, dim=1)
+        out_of_bounds = out_of_bounds | torch.any(torch.abs(self.joint_pos[:, self._pole_dof_idx]) > math.pi / 6, dim=1)
         world_up = torch.tensor([0.0, 0.0, 1.0], device=self.limo.device)
         quat = self.limo.data.root_link_quat_w
         up_dir = math_utils.quat_apply(quat, world_up.expand(quat.shape[0], -1))
@@ -478,7 +478,7 @@ class LimoPendulumNoNoiseEnv2RLGames(DirectRLEnv):
         # 現在の座標とenv_state.originsを引いてどれだけ座標がずれたかを調べる
         dists = torch.norm(self.limo.data.root_link_pos_w - (self.limo.data.default_root_state[:, :3]+self.scene.env_origins),dim=1)
         out_of_bounds = dists > self.cfg.max_cart_pos
-        out_of_bounds = out_of_bounds | torch.any(torch.abs(self.joint_pos[:, self._pole_dof_idx]) > math.pi / 2, dim=1)
+        out_of_bounds = out_of_bounds | torch.any(torch.abs(self.joint_pos[:, self._pole_dof_idx]) > math.pi / 6, dim=1)
         world_up = torch.tensor([0.0, 0.0, 1.0], device=self.limo.device)
         quat = self.limo.data.root_link_quat_w
         up_dir = math_utils.quat_apply(quat, world_up.expand(quat.shape[0], -1))
