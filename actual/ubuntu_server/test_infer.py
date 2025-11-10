@@ -1,24 +1,120 @@
 import yaml
 import numpy as np
+import gym
 from rl_games.torch_runner import Runner
 
-# 1. yamlを読む（runner.pyと同じ）
-with open("path/to/config.yaml", "r") as f:
+# ★ここを自分の実際のパスに変える
+CONFIG_PATH = "infer_cfg.yaml"
+CHECKPOINT_PATH = "last_limo-pendulum_ep_10000_rew_45.83476.pth"
+
+# ★ここを学習環境に合わせて設定
+OBS_DIM = 4   # 観測ベクトル次元
+ACT_DIM = 1    # 行動次元（連続アクション想定）
+
+# 1. 元のyaml読み込み
+with open(CONFIG_PATH, "r") as f:
     cfg = yaml.safe_load(f)
 
+import re
+
+# ログファイルのパス
+LOG_PATH = "infer_log.txt"
+
+obs_list = []
+
+pattern = re.compile(
+    r"\[DEBUG\]: obs tensor\(\[([^\]]+)\]",  # [ ... ] の中身だけ取る
+)
+
+with open(LOG_PATH, "r") as d:
+    for line in d:
+        m = pattern.search(line)
+        if m:
+            # " 0.0734, -0.0573,  0.0016,  0.2029" → [0.0734, -0.0573, 0.0016, 0.2029]
+            vals = [float(x.strip()) for x in m.group(1).split(",")]
+            obs_list.append(vals)
+
+obs_array = np.array(obs_list, dtype=np.float32)
+
+action_list = []
+
+pattern = re.compile(
+    r"\[DEBUG\]: action tensor\(\[([^\]]+)\]",  # [ ... ] の中身だけ取る
+)
+
+with open(LOG_PATH, "r") as d:
+    for line in d:
+        m = pattern.search(line)
+        if m:
+            # " 0.0734, -0.0573,  0.0016,  0.2029" → [0.0734, -0.0573, 0.0016, 0.2029]
+            vals = [float(x.strip()) for x in m.group(1).split(",")]
+            action_list.append(vals)
+
+action_array = np.array(action_list, dtype=np.float32)
+
+# 2. envを作らせないための env_info を注入
+conf = cfg["params"]["config"]
+
+clip_obs = 2.0
+clip_actions = 1.0
+
+conf["env_info"] = {
+    "observation_space": gym.spaces.Box(
+        low=-clip_obs,
+        high=clip_obs,
+        shape=(OBS_DIM,),
+        dtype=np.float32,
+    ),
+    "action_space": gym.spaces.Box(
+        low=-clip_actions,
+        high=clip_actions,
+        shape=(ACT_DIM,),
+        dtype=np.float32,
+    ),
+}
+
+
+# プレイヤー側の設定を安全寄りに
+player_conf = conf.setdefault("player", {})
+player_conf["use_vecenv"] = False
+player_conf["games_num"] = 1
+player_conf["render"] = False
+
+# 3. Runner & Player を作成
 runner = Runner()
-runner.load(cfg)  # cfg は top-level に params を持つ想定
-                   # (runner.py もこれと同じ流れ) :contentReference[oaicite:0]{index=0}
+runner.load(cfg)
 
-# 2. Player を生成
 player = runner.create_player()
+player.restore(CHECKPOINT_PATH)
+player.reset()  # RNN使ってる場合の初期化
 
-# 3. checkpoint を読み込み
-player.restore("runs/xxx/nn/xxx.pth")  # players.PpoPlayer* の restore を呼ぶ :contentReference[oaicite:1]{index=1}
-player.reset()  # RNNあり構成のときの状態初期化（無くても死にはしない）
+def policy(obs_np: np.ndarray) -> np.ndarray:
+    import torch, numpy as np
 
-# 4. 観測から行動を1ステップ出す
-obs = np.array([...], dtype=np.float32)  # 学習時と同じ形・スケール
-action = player.get_action(obs, is_deterministic=True)
+    # ① obs は clip_observations でクリップ
+    obs_t = torch.from_numpy(obs_np).float()
+    obs_t = torch.clamp(obs_t, -clip_obs, clip_obs)
 
-print(action)
+    # ② モデルと同じ device に乗せる
+    device = next(player.model.parameters()).device
+    obs_t = obs_t.to(device)
+
+    # ③ play.py と同じ deterministic 設定を使う
+    action = player.get_action(obs_t, is_deterministic=player.is_deterministic)
+
+    # ④ numpy に戻す
+    if isinstance(action, torch.Tensor):
+        action = action.detach().cpu().numpy()
+
+    # ⑤ 最終的に clip_actions でクリップ（wrapper と同じ）
+    action = np.clip(action, -clip_actions, clip_actions)
+
+    return action
+
+
+
+
+# テスト
+if __name__ == "__main__":
+    for i, obs in enumerate(obs_array):
+        print("true action:",action_array[i][-1],"| infer:",policy(obs))
