@@ -47,5 +47,5 @@ params:
       seed: 5
   
   env:
-  clip_actions: 1.0
-  clip_observations: 2.0
+    clip_actions: 1.0
+    clip_observations: 2.0
