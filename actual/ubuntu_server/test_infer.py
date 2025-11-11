@@ -60,8 +60,8 @@ clip_actions = 1.0
 
 conf["env_info"] = {
     "observation_space": gym.spaces.Box(
-        low=-clip_obs,
-        high=clip_obs,
+        low=-np.inf,
+        high=np.inf,
         shape=(OBS_DIM,),
         dtype=np.float32,
     ),
@@ -74,42 +74,23 @@ conf["env_info"] = {
 }
 
 
-# プレイヤー側の設定を安全寄りに
 player_conf = conf.setdefault("player", {})
 player_conf["use_vecenv"] = False
 player_conf["games_num"] = 1
 player_conf["render"] = False
+# play.py と同じにしたいなら deterministic=True/False をここで明示
+player_conf.setdefault("deterministic", True)
 
-# 3. Runner & Player を作成
 runner = Runner()
 runner.load(cfg)
-
 player = runner.create_player()
 player.restore(CHECKPOINT_PATH)
-player.reset()  # RNN使ってる場合の初期化
+player.reset()  # RNN使ってないなら実害ほぼなし
 
-def policy(obs_np: np.ndarray) -> np.ndarray:
-    import torch, numpy as np
-
-    # ① obs は clip_observations でクリップ
-    obs_t = torch.from_numpy(obs_np).float()
-    obs_t = torch.clamp(obs_t, -clip_obs, clip_obs)
-
-    # ② モデルと同じ device に乗せる
-    device = next(player.model.parameters()).device
-    obs_t = obs_t.to(device)
-
-    # ③ play.py と同じ deterministic 設定を使う
-    action = player.get_action(obs_t, is_deterministic=player.is_deterministic)
-
-    # ④ numpy に戻す
-    if isinstance(action, torch.Tensor):
-        action = action.detach().cpu().numpy()
-
-    # ⑤ 最終的に clip_actions でクリップ（wrapper と同じ）
-    action = np.clip(action, -clip_actions, clip_actions)
-
-    return action
+def policy(obs_np: np.ndarray):
+    # ★obs_npはそのまま渡す。normalizeもclipもplayer側がやる。
+    #   shapeは (OBS_DIM,) または (1, OBS_DIM)
+    return player.get_action(obs_np, is_deterministic=player.is_deterministic)
 
 
 
