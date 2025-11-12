@@ -436,6 +436,7 @@ class LimoPendulumNoNoiseEnv2RLGames(DirectRLEnv):
         light_cfg.func("/World/Light", light_cfg)
 
     def _pre_physics_step(self, actions: torch.Tensor) -> None:
+        print("[DEBUG]: actions",actions)
         self.actions = (self.action_scale * actions).expand(-1, 4).clone()
 
     def _apply_action(self) -> None:
@@ -451,6 +452,7 @@ class LimoPendulumNoNoiseEnv2RLGames(DirectRLEnv):
             ),
             dim=-1,
         )
+        print("[DEBUG]: obs",obs)
         observations = {"policy": obs}
         return observations
 

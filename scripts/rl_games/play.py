@@ -146,6 +146,8 @@ def main():
 
     # set number of actors into agent config
     agent_cfg["params"]["config"]["num_actors"] = env.unwrapped.num_envs
+
+    print("[DEBUG]: agent cfg ")
     # create runner from rl-games
     runner = Runner()
     runner.load(agent_cfg)
@@ -154,6 +156,22 @@ def main():
     agent.restore(resume_path)
     agent.reset()
 
+    print("------------------------")
+    print(agent.model)
+
+    state_dict = agent.model.state_dict()
+    print("------------------------")
+    w = state_dict["sac_network.actor.trunk.2.weight"]
+    print("actor trunk2 weight shape:", w.shape)
+    print("actor trunk2 weight sample:\n", w[:3, :5])
+    print("------------------------")
+    print("has running_mean_std:", hasattr(agent.model, "running_mean_std"))
+    if hasattr(agent.model, "running_mean_std"):
+        for n, p in agent.model.running_mean_std.named_parameters():
+            print("running_mean_std.", n, p.shape, p.mean().item(), p.std().item())
+    print("------------------------")
+    print("agent.is_deterministic",agent.is_deterministic)
+    print("------------------------")
     dt = env.unwrapped.step_dt
 
     # reset environment
