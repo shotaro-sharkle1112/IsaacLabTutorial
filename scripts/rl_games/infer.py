@@ -229,8 +229,12 @@ def policy(obs:torch.Tensor):
         action = agent.get_action(obs, is_deterministic=agent.is_deterministic)
         return action
 
+print("-----------TEST AREA-----------")
 
+print("obs",[ 0.1639, -0.0681,  0.0018,  0.2387])
+print("action",policy(torch.tensor([ 0.1639, -0.0681,  0.0018,  0.2387])))
 
+print("-----------TEST AREA-----------")
 print(f"推論サーバーを起動します: http://{HOST}:{PORT}")
 print(f"推論エンドポイント: POST http://{HOST}:{PORT}/infer")
 print(f"ヘルスチェック: GET http://{HOST}:{PORT}/health")
