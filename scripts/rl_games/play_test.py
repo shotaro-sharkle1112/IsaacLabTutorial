@@ -199,7 +199,7 @@ def main():
             print("[DEBUG]: obs_to_torch",obs)
             # agent stepping
             actions = agent.get_action(obs, is_deterministic=agent.is_deterministic)
-            simulation_app.close()
+            return
             # env stepping
             obs, _, dones, _ = env.step(actions)
 
