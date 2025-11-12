@@ -32,13 +32,17 @@ parser.add_argument(
     help="When no checkpoint provided, use the last saved model. Otherwise use the best saved model.",
 )
 parser.add_argument("--real-time", action="store_true", default=False, help="Run in real-time, if possible.")
-
+# append AppLauncher cli args
+AppLauncher.add_app_launcher_args(parser)
 # parse the arguments
 args_cli = parser.parse_args()
 # always enable cameras to record video
 if args_cli.video:
     args_cli.enable_cameras = True
 
+# launch omniverse app
+app_launcher = AppLauncher(args_cli)
+simulation_app = app_launcher.app
 
 """Rest everything follows."""
 
@@ -142,6 +146,8 @@ def main():
 
     # set number of actors into agent config
     agent_cfg["params"]["config"]["num_actors"] = env.unwrapped.num_envs
+
+    print("[DEBUG]: agent cfg ")
     # create runner from rl-games
     runner = Runner()
     runner.load(agent_cfg)
@@ -150,11 +156,13 @@ def main():
     agent.restore(resume_path)
     agent.reset()
 
+    dt = env.unwrapped.step_dt
+
     # reset environment
     obs = env.reset()
     if isinstance(obs, dict):
         obs = obs["obs"]
-    print("[DEBUG]: obs ",obs)
+    timestep = 0
     # required: enables the flag for batched observations
     _ = agent.get_batch_size(obs, 1)
     # initialize RNN states if used
@@ -164,14 +172,11 @@ def main():
     # note: We simplified the logic in rl-games player.py (:func:`BasePlayer.run()`) function in an
     #   attempt to have complete control over environment stepping. However, this removes other
     #   operations such as masking that is used for multi-agent learning by RL-Games.
-    # run everything in inference mode
     with torch.inference_mode():
         # convert obs to agent format
         obs = agent.obs_to_torch(obs)
         # agent stepping
-        action = agent.get_action(obs, is_deterministic=agent.is_deterministic)
-
-
+        actions = agent.get_action(obs, is_deterministic=agent.is_deterministic)
 
     # close the simulator
     env.close()
@@ -180,3 +185,5 @@ def main():
 if __name__ == "__main__":
     # run the main function
     main()
+    # close sim app
+    simulation_app.close()
