@@ -196,10 +196,11 @@ def main():
             # convert obs to agent format
             
             obs = agent.obs_to_torch(obs)
-            print("[DEBUG]: obs",obs)
+            print("[DEBUG]: obs",torch.tensor([[ 0.0360, -0.0728,  0.0015,  0.1924]], device='cuda:0'))
             # agent stepping
-            actions = agent.get_action(obs, is_deterministic=agent.is_deterministic)
+            actions = agent.get_action(torch.tensor([[ 0.0360, -0.0728,  0.0015,  0.1924]], device='cuda:0'), is_deterministic=agent.is_deterministic)
             print("[DEBUG]: action",actions)
+            return
             # env stepping
             obs, _, dones, _ = env.step(actions)
 
