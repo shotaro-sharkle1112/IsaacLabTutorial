@@ -71,119 +71,167 @@ import isaac_lab_tutorial.tasks  # noqa: F401
 
 # PLACEHOLDER: Extension template (do not remove this comment)
 
+from flask import Flask, request, jsonify
+OBS_DIM = 4
+ACT_DIM = 1
+HOST = "0.0.0.0"  # すべてのネットワークインターフェースでリッスン
+PORT = 5000
+# Flaskアプリの初期化
+app = Flask(__name__)
 
-def main():
-    """Play with RL-Games agent."""
-    # parse env configuration
-    env_cfg = parse_env_cfg(
-        args_cli.task, device=args_cli.device, num_envs=args_cli.num_envs, use_fabric=not args_cli.disable_fabric
-    )
-    agent_cfg = load_cfg_from_registry(args_cli.task, "rl_games_cfg_entry_point")
+@app.route("/infer", methods=["POST"])
+def infer():
+    """推論エンドポイント"""
+    try:
+        # リクエストからJSONデータを取得
+        data = request.get_json()
 
-    # specify directory for logging experiments
-    log_root_path = os.path.join("logs", "rl_games", agent_cfg["params"]["config"]["name"])
-    log_root_path = os.path.abspath(log_root_path)
-    print(f"[INFO] Loading experiment from directory: {log_root_path}")
-    # find checkpoint
-    if args_cli.use_pretrained_checkpoint:
-        resume_path = get_published_pretrained_checkpoint("rl_games", args_cli.task)
-        if not resume_path:
-            print("[INFO] Unfortunately a pre-trained checkpoint is currently unavailable for this task.")
-            return
-    elif args_cli.checkpoint is None:
-        # specify directory for logging runs
-        run_dir = agent_cfg["params"]["config"].get("full_experiment_name", ".*")
-        # specify name of checkpoint
-        if args_cli.use_last_checkpoint:
-            checkpoint_file = ".*"
-        else:
-            # this loads the best checkpoint
-            checkpoint_file = f"{agent_cfg['params']['config']['name']}.pth"
-        # get path to previous checkpoint
-        resume_path = get_checkpoint_path(log_root_path, run_dir, checkpoint_file, other_dirs=["nn"])
+        if "observation" not in data:
+            return jsonify({"error": "observation フィールドが必要です"}), 400
+
+        obs = data["observation"]
+
+        # 観測データの検証
+        if not isinstance(obs, list) or len(obs) != OBS_DIM:
+            return jsonify({
+                "error": f"observation は長さ {OBS_DIM} のリストである必要があります"
+            }), 400
+
+        # numpy配列に変換して推論
+        obs = torch.tensor(obs)
+        action = policy(obs)
+
+        # 結果を返す
+        return jsonify({
+            "action": action.tolist(),
+            "status": "success"
+        })
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/health", methods=["GET"])
+def health():
+    """ヘルスチェックエンドポイント"""
+    return jsonify({"status": "healthy", "model_device": str(device)})
+
+
+
+
+
+
+"""Play with RL-Games agent."""
+# parse env configuration
+env_cfg = parse_env_cfg(
+    args_cli.task, device=args_cli.device, num_envs=args_cli.num_envs, use_fabric=not args_cli.disable_fabric
+)
+agent_cfg = load_cfg_from_registry(args_cli.task, "rl_games_cfg_entry_point")
+
+# specify directory for logging experiments
+log_root_path = os.path.join("logs", "rl_games", agent_cfg["params"]["config"]["name"])
+log_root_path = os.path.abspath(log_root_path)
+print(f"[INFO] Loading experiment from directory: {log_root_path}")
+# find checkpoint
+if args_cli.use_pretrained_checkpoint:
+    resume_path = get_published_pretrained_checkpoint("rl_games", args_cli.task)
+    if not resume_path:
+        print("[INFO] Unfortunately a pre-trained checkpoint is currently unavailable for this task.")
+        return
+elif args_cli.checkpoint is None:
+    # specify directory for logging runs
+    run_dir = agent_cfg["params"]["config"].get("full_experiment_name", ".*")
+    # specify name of checkpoint
+    if args_cli.use_last_checkpoint:
+        checkpoint_file = ".*"
     else:
-        resume_path = retrieve_file_path(args_cli.checkpoint)
-    log_dir = os.path.dirname(os.path.dirname(resume_path))
+        # this loads the best checkpoint
+        checkpoint_file = f"{agent_cfg['params']['config']['name']}.pth"
+    # get path to previous checkpoint
+    resume_path = get_checkpoint_path(log_root_path, run_dir, checkpoint_file, other_dirs=["nn"])
+else:
+    resume_path = retrieve_file_path(args_cli.checkpoint)
+log_dir = os.path.dirname(os.path.dirname(resume_path))
 
-    # wrap around environment for rl-games
-    rl_device = agent_cfg["params"]["config"]["device"]
-    clip_obs = agent_cfg["params"]["env"].get("clip_observations", math.inf)
-    clip_actions = agent_cfg["params"]["env"].get("clip_actions", math.inf)
+# wrap around environment for rl-games
+rl_device = agent_cfg["params"]["config"]["device"]
+clip_obs = agent_cfg["params"]["env"].get("clip_observations", math.inf)
+clip_actions = agent_cfg["params"]["env"].get("clip_actions", math.inf)
 
-    # create isaac environment
-    env = gym.make(args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None)
+# create isaac environment
+env = gym.make(args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None)
 
-    # convert to single-agent instance if required by the RL algorithm
-    if isinstance(env.unwrapped, DirectMARLEnv):
-        env = multi_agent_to_single_agent(env)
+# convert to single-agent instance if required by the RL algorithm
+if isinstance(env.unwrapped, DirectMARLEnv):
+    env = multi_agent_to_single_agent(env)
 
-    # wrap for video recording
-    if args_cli.video:
-        video_kwargs = {
-            "video_folder": os.path.join(log_root_path, log_dir, "videos", "play"),
-            "step_trigger": lambda step: step == 0,
-            "video_length": args_cli.video_length,
-            "disable_logger": True,
-        }
-        print("[INFO] Recording videos during training.")
-        print_dict(video_kwargs, nesting=4)
-        env = gym.wrappers.RecordVideo(env, **video_kwargs)
+# wrap for video recording
+if args_cli.video:
+    video_kwargs = {
+        "video_folder": os.path.join(log_root_path, log_dir, "videos", "play"),
+        "step_trigger": lambda step: step == 0,
+        "video_length": args_cli.video_length,
+        "disable_logger": True,
+    }
+    print("[INFO] Recording videos during training.")
+    print_dict(video_kwargs, nesting=4)
+    env = gym.wrappers.RecordVideo(env, **video_kwargs)
 
-    # wrap around environment for rl-games
-    env = RlGamesVecEnvWrapper(env, rl_device, clip_obs, clip_actions)
+# wrap around environment for rl-games
+env = RlGamesVecEnvWrapper(env, rl_device, clip_obs, clip_actions)
 
-    # register the environment to rl-games registry
-    # note: in agents configuration: environment name must be "rlgpu"
-    vecenv.register(
-        "IsaacRlgWrapper", lambda config_name, num_actors, **kwargs: RlGamesGpuEnv(config_name, num_actors, **kwargs)
-    )
-    env_configurations.register("rlgpu", {"vecenv_type": "IsaacRlgWrapper", "env_creator": lambda **kwargs: env})
+# register the environment to rl-games registry
+# note: in agents configuration: environment name must be "rlgpu"
+vecenv.register(
+    "IsaacRlgWrapper", lambda config_name, num_actors, **kwargs: RlGamesGpuEnv(config_name, num_actors, **kwargs)
+)
+env_configurations.register("rlgpu", {"vecenv_type": "IsaacRlgWrapper", "env_creator": lambda **kwargs: env})
 
-    # load previously trained model
-    agent_cfg["params"]["load_checkpoint"] = True
-    agent_cfg["params"]["load_path"] = resume_path
-    print(f"[INFO]: Loading model checkpoint from: {agent_cfg['params']['load_path']}")
+# load previously trained model
+agent_cfg["params"]["load_checkpoint"] = True
+agent_cfg["params"]["load_path"] = resume_path
+print(f"[INFO]: Loading model checkpoint from: {agent_cfg['params']['load_path']}")
 
-    # set number of actors into agent config
-    agent_cfg["params"]["config"]["num_actors"] = env.unwrapped.num_envs
+# set number of actors into agent config
+agent_cfg["params"]["config"]["num_actors"] = env.unwrapped.num_envs
 
-    print("[DEBUG]: agent cfg ")
-    # create runner from rl-games
-    runner = Runner()
-    runner.load(agent_cfg)
-    # obtain the agent from the runner
-    agent: BasePlayer = runner.create_player()
-    agent.restore(resume_path)
-    agent.reset()
+print("[DEBUG]: agent cfg ")
+# create runner from rl-games
+runner = Runner()
+runner.load(agent_cfg)
+# obtain the agent from the runner
+agent: BasePlayer = runner.create_player()
+agent.restore(resume_path)
+agent.reset()
 
-    dt = env.unwrapped.step_dt
+dt = env.unwrapped.step_dt
 
-    # reset environment
-    obs = env.reset()
-    if isinstance(obs, dict):
-        obs = obs["obs"]
-    timestep = 0
-    # required: enables the flag for batched observations
-    _ = agent.get_batch_size(obs, 1)
-    # initialize RNN states if used
-    if agent.is_rnn:
-        agent.init_rnn()
+# reset environment
+obs = env.reset()
+if isinstance(obs, dict):
+    obs = obs["obs"]
+timestep = 0
+# required: enables the flag for batched observations
+_ = agent.get_batch_size(obs, 1)
+# initialize RNN states if used
+if agent.is_rnn:
+    agent.init_rnn()
     # simulate environment
     # note: We simplified the logic in rl-games player.py (:func:`BasePlayer.run()`) function in an
     #   attempt to have complete control over environment stepping. However, this removes other
     #   operations such as masking that is used for multi-agent learning by RL-Games.
+
+def policy(obs:torch.Tensor):
     with torch.inference_mode():
         # convert obs to agent format
         obs = agent.obs_to_torch(obs)
         # agent stepping
-        actions = agent.get_action(obs, is_deterministic=agent.is_deterministic)
-
-    # close the simulator
-    env.close()
+        action = agent.get_action(obs, is_deterministic=agent.is_deterministic)
+        return action
 
 
-if __name__ == "__main__":
-    # run the main function
-    main()
-    # close sim app
-    simulation_app.close()
+
+print(f"推論サーバーを起動します: http://{HOST}:{PORT}")
+print(f"推論エンドポイント: POST http://{HOST}:{PORT}/infer")
+print(f"ヘルスチェック: GET http://{HOST}:{PORT}/health")
+app.run(host=HOST, port=PORT, debug=False)
