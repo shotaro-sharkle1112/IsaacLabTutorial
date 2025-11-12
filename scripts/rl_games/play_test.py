@@ -194,7 +194,11 @@ def main():
         # run everything in inference mode
         with torch.inference_mode():
             # convert obs to agent format
-            
+            obs = agent.obs_to_torch(obs)
+            print("[DEBUG]: obs",torch.tensor([[ 3.5487e-02,  0.0000e+00, -5.2387e-10,  0.0000e+00]], device='cuda:0'))
+            # agent stepping
+            actions = agent.get_action(torch.tensor([[ 3.5487e-02,  0.0000e+00, -5.2387e-10,  0.0000e+00]], device='cuda:0'), is_deterministic=agent.is_deterministic)
+            print("[DEBUG]: action",actions)
             obs = agent.obs_to_torch(obs)
             print("[DEBUG]: obs",torch.tensor([[ 0.0360, -0.0728,  0.0015,  0.1924]], device='cuda:0'))
             # agent stepping
