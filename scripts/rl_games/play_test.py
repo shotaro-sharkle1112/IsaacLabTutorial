@@ -176,7 +176,6 @@ def main():
 
     # reset environment
     obs = env.reset()
-    print("[DEBUG]: env.reset.obs",obs)
     if isinstance(obs, dict):
         obs = obs["obs"]
     timestep = 0
@@ -189,21 +188,23 @@ def main():
     # note: We simplified the logic in rl-games player.py (:func:`BasePlayer.run()`) function in an
     #   attempt to have complete control over environment stepping. However, this removes other
     #   operations such as masking that is used for multi-agent learning by RL-Games.
+    agent.model.eval()
     while simulation_app.is_running():
         start_time = time.time()
         # run everything in inference mode
         with torch.inference_mode():
             # convert obs to agent format
             obs = agent.obs_to_torch(obs)
-            print("[DEBUG]: obs",torch.tensor([[ 3.5487e-02,  0.0000e+00, -5.2387e-10,  0.0000e+00]], device='cuda:0'))
-            # agent stepping
-            actions = agent.get_action(torch.tensor([[ 3.5487e-02,  0.0000e+00, -5.2387e-10,  0.0000e+00]], device='cuda:0'), is_deterministic=agent.is_deterministic)
-            print("[DEBUG]: action",actions)
-            obs = agent.obs_to_torch(obs)
             print("[DEBUG]: obs",torch.tensor([[ 0.0360, -0.0728,  0.0015,  0.1924]], device='cuda:0'))
             # agent stepping
             actions = agent.get_action(torch.tensor([[ 0.0360, -0.0728,  0.0015,  0.1924]], device='cuda:0'), is_deterministic=agent.is_deterministic)
             print("[DEBUG]: action",actions)
+            for i in range(200):
+                obs = agent.obs_to_torch(obs)
+                print("[DEBUG]: obs",torch.tensor([[ 0.0360, -0.0728,  0.0015,  0.1924]], device='cuda:0'))
+                # agent stepping
+                actions = agent.get_action(torch.tensor([[ 0.0360, -0.0728,  0.0015,  0.1924]], device='cuda:0'), is_deterministic=agent.is_deterministic)
+                print("[DEBUG]: action",actions)
             return
             # env stepping
             obs, _, dones, _ = env.step(actions)
