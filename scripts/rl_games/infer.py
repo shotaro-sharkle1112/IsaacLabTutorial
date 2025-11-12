@@ -231,8 +231,8 @@ def policy(obs:torch.Tensor):
 
 print("-----------TEST AREA-----------")
 
-print("obs",[ 0.1639, -0.0681,  0.0018,  0.2387])
-print("action",policy(torch.tensor([ 0.1639, -0.0681,  0.0018,  0.2387],device="cuda")))
+print("obs",[[ 0.0360, -0.0728,  0.0015,  0.1924]])
+print("action",policy(torch.tensor([[ 0.0360, -0.0728,  0.0015,  0.1924]],device="cuda")))
 
 print("-----------TEST AREA-----------")
 print(f"推論サーバーを起動します: http://{HOST}:{PORT}")
