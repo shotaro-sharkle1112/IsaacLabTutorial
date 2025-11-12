@@ -74,23 +74,53 @@ conf["env_info"] = {
 }
 
 
+# プレイヤー側の設定を安全寄りに
 player_conf = conf.setdefault("player", {})
 player_conf["use_vecenv"] = False
 player_conf["games_num"] = 1
 player_conf["render"] = False
-# play.py と同じにしたいなら deterministic=True/False をここで明示
-player_conf.setdefault("deterministic", True)
 
+# 3. Runner & Player を作成
 runner = Runner()
 runner.load(cfg)
+
 player = runner.create_player()
 player.restore(CHECKPOINT_PATH)
-player.reset()  # RNN使ってないなら実害ほぼなし
+player.reset()  # RNN使ってる場合の初期化
+print("------------------------")
+print(player.model)
 
-def policy(obs_np: np.ndarray):
-    # ★obs_npはそのまま渡す。normalizeもclipもplayer側がやる。
-    #   shapeは (OBS_DIM,) または (1, OBS_DIM)
-    return player.get_action(obs_np, is_deterministic=player.is_deterministic)
+state_dict = player.model.state_dict()
+print("------------------------")
+w = state_dict["sac_network.actor.trunk.2.weight"]
+print("actor trunk2 weight shape:", w.shape)
+print("actor trunk2 weight sample:\n", w[:3, :5])
+print("------------------------")
+print("has running_mean_std:", hasattr(player.model, "running_mean_std"))
+if hasattr(player.model, "running_mean_std"):
+    for n, p in player.model.running_mean_std.named_parameters():
+        print("running_mean_std.", n, p.shape, p.mean().item(), p.std().item())
+print("------------------------")
+def policy(obs_np: np.ndarray) -> np.ndarray:
+    import torch
+
+    if obs_np.ndim == 1:
+        obs_np = obs_np[None, :]
+    
+    obs_t = torch.from_numpy(obs_np).float()
+    print(obs_t)
+    # ② モデルと同じ device に乗せる
+    device = next(player.model.parameters()).device
+    obs_t = obs_t.to(device)
+
+    # ③ play.py と同じ deterministic 設定を使う
+    action = player.get_action(obs_t, is_deterministic=True)
+
+    # ④ numpy に戻す
+    if isinstance(action, torch.Tensor):
+        action = action.detach().cpu().numpy()
+
+    return action
 
 
 
