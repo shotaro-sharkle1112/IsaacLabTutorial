@@ -137,7 +137,7 @@ if args_cli.use_pretrained_checkpoint:
     resume_path = get_published_pretrained_checkpoint("rl_games", args_cli.task)
     if not resume_path:
         print("[INFO] Unfortunately a pre-trained checkpoint is currently unavailable for this task.")
-        return
+        exit()
 elif args_cli.checkpoint is None:
     # specify directory for logging runs
     run_dir = agent_cfg["params"]["config"].get("full_experiment_name", ".*")
@@ -227,7 +227,7 @@ def policy(obs:torch.Tensor):
         obs = agent.obs_to_torch(obs)
         # agent stepping
         action = agent.get_action(obs, is_deterministic=agent.is_deterministic)
-    return action
+        return action
 
 
 
