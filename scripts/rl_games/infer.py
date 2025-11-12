@@ -227,7 +227,7 @@ def policy(obs:torch.Tensor):
         obs = agent.obs_to_torch(obs)
         # agent stepping
         action = agent.get_action(obs, is_deterministic=agent.is_deterministic)
-        return action
+    return action
 
 
 
