@@ -54,8 +54,8 @@ class LimoEnvCfg(DirectRLEnvCfg):
 class LimoPendulumEnvCfg(DirectRLEnvCfg):
     # env
     decimation = 2
-    episode_length_s = 5.0
-    action_scale = 100.0
+    episode_length_s = 30.0
+    action_scale = 10.0
     # - spaces definition
     action_space = 1
     # observation_space = 9
@@ -70,12 +70,12 @@ class LimoPendulumEnvCfg(DirectRLEnvCfg):
     cart_dof_names = ["front_left_wheel","front_right_wheel", "rear_left_wheel", "rear_right_wheel"]
     pole_dof_name = ["pendulum"]
 
-    max_cart_pos = 3.0  # the cart is reset if it exceeds that position [m]
+    max_cart_pos = 10000.0  # the cart is reset if it exceeds that position [m]
     initial_pole_angle_range = [-0.05, 0.05]  # the range in which the pole angle is sampled from on reset [rad]
     weight_range = [0.1, 0.3]
     # reward scales
     rew_scale_alive = 1.0
-    rew_scale_terminated = -2.0
+    rew_scale_terminated = 0.0
     rew_scale_pole_pos = -1.0
     rew_scale_pole_vel = -0.005
     rew_scale_cart_vel = -0.01
