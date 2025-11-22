@@ -4,8 +4,8 @@ import gym
 from rl_games.torch_runner import Runner
 
 # ★ここを自分の実際のパスに変える
-CONFIG_PATH = "infer_cfg.yaml"
-CHECKPOINT_PATH = "last_limo-pendulum_ep_10000_rew_45.83476.pth"
+CONFIG_PATH = "rl_games_sac_cfg2.yaml"
+CHECKPOINT_PATH = "limo-pendulum.pth"
 
 # ★ここを学習環境に合わせて設定
 OBS_DIM = 4   # 観測ベクトル次元
@@ -124,9 +124,9 @@ def policy(obs_np: np.ndarray) -> np.ndarray:
     return action
 
 
-obs = np.array([ 0.1639, -0.0681,  0.0018,  0.2387])
+obs = np.array([ 0.0516, -1.1301, 0.0163, 0.6297])
 
 # テスト
 if __name__ == "__main__":
     for i in range(3):
-        print("true action:",0.0694,"| infer:",policy(obs))
+        print("true action:",0.9265,"| infer:",policy(obs))
