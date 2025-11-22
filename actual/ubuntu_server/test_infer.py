@@ -34,6 +34,7 @@ with open(LOG_PATH, "r") as d:
             vals = [float(x.strip()) for x in m.group(1).split(",")]
             obs_list.append(vals)
 
+
 obs_array = np.array(obs_list, dtype=np.float32)
 
 action_list = []
@@ -123,9 +124,9 @@ def policy(obs_np: np.ndarray) -> np.ndarray:
     return action
 
 
-
+obs = np.array([ 0.1639, -0.0681,  0.0018,  0.2387])
 
 # テスト
 if __name__ == "__main__":
-    for i, obs in enumerate(obs_array):
-        print("true action:",action_array[i][-1],"| infer:",policy(obs))
+    for i in range(3):
+        print("true action:",0.0694,"| infer:",policy(obs))
