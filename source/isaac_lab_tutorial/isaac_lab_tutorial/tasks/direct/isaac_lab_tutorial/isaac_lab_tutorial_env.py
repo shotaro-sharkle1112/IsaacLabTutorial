@@ -446,6 +446,7 @@ class LimoPendulumNoNoiseEnv2RLGames(DirectRLEnv):
         print("[DEBUG]: joint velocity",self.actions)
 
     def _get_observations(self) -> dict:
+        
         obs = torch.cat(
             (
                 self.joint_pos[:, self._pole_dof_idx[0]].unsqueeze(dim=1),
@@ -455,6 +456,7 @@ class LimoPendulumNoNoiseEnv2RLGames(DirectRLEnv):
             ),
             dim=-1,
         )
+        print("obs:",obs)
         observations = {"policy": obs}
         return observations
 

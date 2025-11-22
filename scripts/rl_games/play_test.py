@@ -201,11 +201,7 @@ def main():
             print("[DEBUG]: action",actions)
             for i in range(200):
                 state_dict = agent.model.state_dict()
-                print("------------------------")
-                w = state_dict["sac_network.actor.trunk.2.weight"]
-                print("actor trunk2 weight shape:", w.shape)
-                print("actor trunk2 weight sample:\n", w[:3, :5])
-                print("------------------------")
+
                 obs = agent.obs_to_torch(obs)
                 print("[DEBUG]: obs",torch.tensor([[ 0.0360, -0.0728,  0.0015,  0.1924]], device='cuda:0'))
                 # agent stepping
