@@ -436,14 +436,10 @@ class LimoPendulumNoNoiseEnv2RLGames(DirectRLEnv):
         light_cfg.func("/World/Light", light_cfg)
 
     def _pre_physics_step(self, actions: torch.Tensor) -> None:
-        print("[DEBUG]: ")
         self.actions = (self.action_scale * actions).expand(-1, 4).clone()
-        print("[DEBUG]: actions",actions)
-        print("[DEBUG]: self.actions",self.actions)
 
     def _apply_action(self) -> None:
         self.limo.set_joint_velocity_target(self.actions, joint_ids=self._cart_dof_idxs)
-        print("[DEBUG]: joint velocity",self.actions)
 
     def _get_observations(self) -> dict:
         
@@ -456,7 +452,6 @@ class LimoPendulumNoNoiseEnv2RLGames(DirectRLEnv):
             ),
             dim=-1,
         )
-        print("obs:",obs)
         observations = {"policy": obs}
         return observations
 
