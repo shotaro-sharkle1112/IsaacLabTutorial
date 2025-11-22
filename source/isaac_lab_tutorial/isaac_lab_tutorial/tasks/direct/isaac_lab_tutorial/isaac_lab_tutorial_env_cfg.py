@@ -55,7 +55,7 @@ class LimoPendulumEnvCfg(DirectRLEnvCfg):
     # env
     decimation = 2
     episode_length_s = 30.0
-    action_scale = 30.0
+    action_scale = 60.0
     # - spaces definition
     action_space = 1
     # observation_space = 9
