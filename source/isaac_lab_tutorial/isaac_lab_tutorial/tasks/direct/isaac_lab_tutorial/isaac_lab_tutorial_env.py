@@ -440,6 +440,7 @@ class LimoPendulumNoNoiseEnv2RLGames(DirectRLEnv):
 
     def _apply_action(self) -> None:
         self.limo.set_joint_velocity_target(self.actions, joint_ids=self._cart_dof_idxs)
+        print("actions",self.actions)
 
     def _get_observations(self) -> dict:
         
