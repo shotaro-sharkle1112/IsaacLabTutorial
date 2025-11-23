@@ -7,7 +7,7 @@ from nav_msgs.msg import Odometry
 from std_msgs.msg import Float32
 
 # デフォルトのサーバーURL（必要ならパラメータで上書き）
-SERVER_URL_DEFAULT = "http://192.168.3.12:5000"
+SERVER_URL_DEFAULT = "http://192.168.11.4:5000"
 
 
 class LimoPendulumInferenceNode(object):
@@ -26,7 +26,7 @@ class LimoPendulumInferenceNode(object):
 
         # Subscriber
         self.sub_odom = rospy.Subscriber(
-            "/imu", Odometry, self.odom_callback, queue_size=10
+            "/odom", Odometry, self.odom_callback, queue_size=10
         )
         self.sub_angle = rospy.Subscriber(
             "/pendulum/angle_rad", Float32, self.angle_callback, queue_size=10
