@@ -202,9 +202,9 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             previous_error = normalized_error
             
             target_angular_vel = (args_cli.p * normalized_error) + (args_cli.i * integral_error) + (args_cli.d * derivative_error)
-                
+            target_angular_vel = 60.0
             # select action
-            target_vel = torch.tensor([[target_angular_vel, -target_angular_vel, target_angular_vel, -target_angular_vel, 0.0]], device=scene.device)
+            target_vel = torch.tensor([[target_angular_vel, target_angular_vel, target_angular_vel, target_angular_vel, 0.0]], device=scene.device)
             # change state
             learning_state = 2
 
@@ -232,10 +232,14 @@ def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
             steps = 0
             episodes += 1
             # print(f"[INFO]: episodes {episodes}")
-            print("[DEBUG]: degree_error",math.degrees(yaw_error))
+            print("------------reset!!-----------")
 
-        if steps % 20 == 0:
-            print("[DEBUG]: pendulum ", torch.rad2deg(scene["Limo"].data.joint_pos[0,4]))
+        if steps % 10 == 0:
+            print("------------------------------")
+            print("[DEBUG]: limo vel ", scene["Limo"].data.root_com_lin_vel_w[:, 0].unsqueeze(dim=1))
+            print("[DEBUG]: limo x ", scene["Limo"].data.root_link_pos_w[:, 0])
+            print("[DEBUG]: pole theta ",scene["Limo"].data.joint_pos[0,4])
+            print("[DEBUG]: pole vel ",scene["Limo"].data.joint_vel[0,4])
         
 
         

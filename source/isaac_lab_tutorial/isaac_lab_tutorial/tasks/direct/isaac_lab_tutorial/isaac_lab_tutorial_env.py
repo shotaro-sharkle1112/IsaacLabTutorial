@@ -437,10 +437,10 @@ class LimoPendulumNoNoiseEnv2RLGames(DirectRLEnv):
 
     def _pre_physics_step(self, actions: torch.Tensor) -> None:
         self.actions = (self.action_scale * actions).expand(-1, 4).clone()
+        # print("[DEBUG]:Isaac lab action",actions)
 
     def _apply_action(self) -> None:
         self.limo.set_joint_velocity_target(self.actions, joint_ids=self._cart_dof_idxs)
-        print("actions",self.actions)
 
     def _get_observations(self) -> dict:
         
@@ -453,6 +453,7 @@ class LimoPendulumNoNoiseEnv2RLGames(DirectRLEnv):
             ),
             dim=-1,
         )
+        # print("[DEBUG]:Isaac lab obs",obs)
         observations = {"policy": obs}
         return observations
 
@@ -470,6 +471,7 @@ class LimoPendulumNoNoiseEnv2RLGames(DirectRLEnv):
             self.limo.data.root_com_lin_vel_w[:, 0],
             self.reset_terminated,
         )
+        # print("[DEBUG]:Isaac lab reward",total_reward)
         return total_reward
 
     def _get_dones(self) -> tuple[torch.Tensor, torch.Tensor]:
