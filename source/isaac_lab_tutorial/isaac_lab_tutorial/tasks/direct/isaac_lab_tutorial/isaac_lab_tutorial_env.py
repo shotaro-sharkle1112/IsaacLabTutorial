@@ -406,6 +406,11 @@ def compute_rewards2(
     rew_pole_vel = rew_scale_pole_vel * torch.sum(torch.square(pole_vel).unsqueeze(dim=1), dim=-1)
     rew_cart_pos = rew_scale_cart_pos * torch.sum(torch.square(cart_pos).unsqueeze(dim=1), dim=-1)
     rew_cart_vel = rew_scale_cart_vel * torch.sum(torch.square(cart_vel).unsqueeze(dim=1), dim=-1)
+    #print("[DEBUG]:rew_pole_pos",rew_pole_pos)
+    #print("[DEBUG]:rew_pole_vel",rew_pole_vel)
+    #print("[DEBUG]:rew_cart_pos",rew_cart_pos)
+    #print("[DEBUG]:rew_cart_vel",rew_cart_vel)
+    #print("-------------------")
     total_reward = rew_termination + rew_pole_pos + rew_cart_pos + rew_cart_vel + rew_pole_vel
     return total_reward
 

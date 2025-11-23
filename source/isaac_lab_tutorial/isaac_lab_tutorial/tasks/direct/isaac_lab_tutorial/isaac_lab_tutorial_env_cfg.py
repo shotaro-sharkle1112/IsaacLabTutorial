@@ -75,11 +75,11 @@ class LimoPendulumEnvCfg(DirectRLEnvCfg):
     weight_range = [0.1, 0.3]
     # reward scales
     rew_scale_alive = 1.0
-    rew_scale_terminated = 0.0
+    rew_scale_terminated = -2.0
     rew_scale_pole_pos = -1.0
     rew_scale_pole_vel = -0.01
-    rew_scale_cart_vel = -0.01
-    rew_scale_cart_pos = -0.01
+    rew_scale_cart_vel = -0.001
+    rew_scale_cart_pos = -0.001
     
 
 @configclass
