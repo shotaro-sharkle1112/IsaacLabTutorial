@@ -5,28 +5,7 @@ Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or conta
 See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
 /home/vehicle/shotaro_ws/ubuntu_server/env_infer/lib/python3.10/site-packages/rl_games/algos_torch/torch_ext.py:62: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
   return func(*args, **kwargs)
-/home/vehicle/shotaro_ws/ubuntu_server/env_infer/lib/python3.10/site-packages/rl_games/algos_torch/running_mean_std.py:51: UserWarning: var(): degrees of freedom is <= 0. Correction should be strictly less than the reduction factor (input numel divided by output numel). (Triggered internally at ../aten/src/ATen/native/ReduceOps.cpp:1823.)
-  var = input.var(self.axis)
 Traceback (most recent call last):
-  File "/home/vehicle/shotaro_ws/ubuntu_server/test_sac_agent.py", line 72, in <module>
-    print("true action:",0.9265,"| infer:",policy(obs))
-  File "/home/vehicle/shotaro_ws/ubuntu_server/test_sac_agent.py", line 59, in policy
-    action = agent.act(obs_t, 1, sample=False)
-  File "/home/vehicle/shotaro_ws/ubuntu_server/env_infer/lib/python3.10/site-packages/rl_games/algos_torch/sac_agent.py", line 422, in act
-    dist = self.model.actor(obs)
-  File "/home/vehicle/shotaro_ws/ubuntu_server/env_infer/lib/python3.10/site-packages/rl_games/algos_torch/models.py", line 352, in actor
-    return self.sac_network.actor(obs)
-  File "/home/vehicle/shotaro_ws/ubuntu_server/env_infer/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/home/vehicle/shotaro_ws/ubuntu_server/env_infer/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/home/vehicle/shotaro_ws/ubuntu_server/env_infer/lib/python3.10/site-packages/rl_games/algos_torch/network_builder.py", line 853, in forward
-    dist = SquashedNormal(mu, std)
-  File "/home/vehicle/shotaro_ws/ubuntu_server/env_infer/lib/python3.10/site-packages/rl_games/algos_torch/sac_helper.py", line 42, in __init__
-    self.base_dist = pyd.Normal(loc, scale)
-  File "/home/vehicle/shotaro_ws/ubuntu_server/env_infer/lib/python3.10/site-packages/torch/distributions/normal.py", line 59, in __init__
-    super().__init__(batch_shape, validate_args=validate_args)
-  File "/home/vehicle/shotaro_ws/ubuntu_server/env_infer/lib/python3.10/site-packages/torch/distributions/distribution.py", line 71, in __init__
-    raise ValueError(
-ValueError: Expected parameter loc (Tensor of shape (1, 1)) of distribution Normal(loc: tensor([[nan]], device='cuda:0', grad_fn=<SplitBackward0>), scale: tensor([[nan]], device='cuda:0', grad_fn=<ExpBackward0>)) to satisfy the constraint Real(), but found invalid values:
-tensor([[nan]], device='cuda:0', grad_fn=<SplitBackward0>)
+  File "/home/vehicle/shotaro_ws/ubuntu_server/test_sac_agent.py", line 52, in <module>
+    agent.replay_buffer.add(torch.Tensor([[ 3.5487e-02,  0.0000e+00, -5.2387e-10,  0.0000e+00]], device='cuda:0') ,torch.Tensor([[-0.3472]], device='cuda:0'),torch.Tensor([[0.9801]], device='cuda:0') ,torch.Tensor([[ 0.0183, -1.6309,  0.0336,  0.7934]], device='cuda:0') ,torch.Tensor([[False]], device='cuda:0'))
+RuntimeError: legacy constructor expects device type: cpu but device type: cuda was passed

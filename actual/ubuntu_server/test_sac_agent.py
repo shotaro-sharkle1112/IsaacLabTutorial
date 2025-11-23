@@ -2,6 +2,7 @@ import yaml
 import numpy as np
 import gym
 from rl_games.torch_runner import Runner
+import torch
 
 
 # ★ここを自分の実際のパスに変える
@@ -46,10 +47,37 @@ agent.restore(CHECKPOINT_PATH)
 agent.init_tensors()
 agent.algo_observer.after_init(agent)
 
-agent.set_eval()
+
+for i in range(5000):
+    agent.replay_buffer.add(torch.tensor([[ 3.5487e-02,  0.0000e+00, -5.2387e-10,  0.0000e+00]], device='cuda:0') ,torch.tensor([[-0.3472]], device='cuda:0'),torch.tensor([[0.9801]], device='cuda:0') ,torch.tensor([[ 0.0183, -1.6309,  0.0336,  0.7934]], device='cuda:0') ,torch.tensor([[False]], device='cuda:0'))
+print(agent.replay_buffer.sample(1))
+print("------------------------")
+print(agent.replay_buffer.capacity)
+print("------------------------")
+print(agent.model)
+
+state_dict = agent.model.state_dict()
+print("------------------------")
+w = state_dict["sac_network.actor.trunk.2.weight"]
+print("actor trunk2 weight shape:", w.shape)
+print("actor trunk2 weight sample:\n", w[:3, :5])
+print("------------------------")
+
+agent.update(0)
+
+state_dict = agent.model.state_dict()
+print("------------------------")
+w = state_dict["sac_network.actor.trunk.2.weight"]
+print("actor trunk2 weight shape:", w.shape)
+print("actor trunk2 weight sample:\n", w[:3, :5])
+print("------------------------")
+
+
+
+
 
 def policy(obs_np: np.ndarray) -> np.ndarray:
-    import torch
+
 
     if obs_np.ndim == 1:
         obs_np = obs_np[None, :]
@@ -70,9 +98,3 @@ def policy(obs_np: np.ndarray) -> np.ndarray:
 
 obs = np.array([[ 0.0516, -1.1301, 0.0163, 0.6297],
                 [ 0.0516, -1.1301, 0.0163, 0.6297]])
-
-# テスト
-if __name__ == "__main__":
-    for i in range(3):
-        print("true action:",0.9265,"| infer:",policy(obs)[0])
-        print("--------------------------")

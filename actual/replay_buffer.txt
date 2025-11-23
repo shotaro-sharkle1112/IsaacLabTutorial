@@ -1,0 +1,13 @@
+[DEBUG]:Isaac lab obs tensor([[ 3.5487e-02,  0.0000e+00, -5.2387e-10,  0.0000e+00]], device='cuda:0')
+[DEBUG]:Isaac lab action tensor([[0.6517]], device='cuda:0')
+[DEBUG]:Isaac lab obs tensor([[0.0305, 1.8586, 0.0089, 0.6970]], device='cuda:0')
+[DEBUG]:Inside RL Games tensor([[ 3.5487e-02,  0.0000e+00, -5.2387e-10,  0.0000e+00]], device='cuda:0') tensor([[0.6517]], device='cuda:0') tensor([[0.9769]], device='cuda:0') tensor([[0.0305, 1.8586, 0.0089, 0.6970]], device='cuda:0') tensor([[False]], device='cuda:0')
+
+[DEBUG]:Isaac lab action tensor([[0.4592]], device='cuda:0')
+[DEBUG]:Isaac lab obs tensor([[0.0454, 0.6969, 0.0198, 0.7633]], device='cuda:0')
+[DEBUG]:Inside RL Games tensor([[ 3.5487e-02,  0.0000e+00, -5.2387e-10,  0.0000e+00]], device='cuda:0') tensor([[0.4592]], device='cuda:0') tensor([[0.9897]], device='cuda:0') tensor([[0.0454, 0.6969, 0.0198, 0.7633]], device='cuda:0') tensor([[False]], device='cuda:0')
+
+[DEBUG]:Isaac lab action tensor([[-0.3472]], device='cuda:0')
+[DEBUG]:Isaac lab obs tensor([[ 0.0183, -1.6309,  0.0336,  0.7934]], device='cuda:0')
+[DEBUG]:Inside RL Games tensor([[ 3.5487e-02,  0.0000e+00, -5.2387e-10,  0.0000e+00]], device='cuda:0') tensor([[-0.3472]], device='cuda:0') tensor([[0.9801]], device='cuda:0') tensor([[ 0.0183, -1.6309,  0.0336,  0.7934]], device='cuda:0') tensor([[False]], device='cuda:0')
+print("[DEBUG]:Inside RL Games",obs, action, torch.unsqueeze(rewards, 1), next_obs_processed, torch.unsqueeze(dones, 1))
