@@ -12,7 +12,7 @@ params:
     space:
       continuous:
     mlp:
-      units: [64, 32]
+      units: [512, 256]
       activation: relu
       
       initializer:
