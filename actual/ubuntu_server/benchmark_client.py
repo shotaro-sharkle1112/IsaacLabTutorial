@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 """
-推論サーバーのベンチマークテスト
-1000個のダミーデータを送信して処理時間を計測
-
-使用方法:
-    python benchmark_client.py
+python benchmark_client.py
 """
 import requests
 import json
@@ -12,19 +8,16 @@ import time
 import numpy as np
 from statistics import mean, stdev
 
-# サーバーのURL
-SERVER_URL = "http://192.168.3.12:5000"
+SERVER_URL = "http://192.168.11.4:5000"
 NUM_REQUESTS = 1000
 OBS_DIM = 4
 
 
 def generate_dummy_observation():
-    """ランダムなダミー観測データを生成"""
     return np.random.uniform(-2.0, 2.0, OBS_DIM).tolist()
 
 
 def send_inference_request(observation):
-    """推論リクエストを送信"""
     response = requests.post(
         f"{SERVER_URL}/infer",
         json={"observation": observation},
@@ -34,12 +27,10 @@ def send_inference_request(observation):
 
 
 def benchmark():
-    """ベンチマークテスト"""
     print(f"=== 推論サーバー ベンチマークテスト ===")
     print(f"送信データ数: {NUM_REQUESTS}")
     print(f"サーバーURL: {SERVER_URL}\n")
 
-    # ヘルスチェック
     try:
         health_response = requests.get(f"{SERVER_URL}/health", timeout=5)
         print(f"サーバーステータス: {health_response.json()}\n")
@@ -47,12 +38,10 @@ def benchmark():
         print(f"エラー: サーバーに接続できません - {e}")
         return
 
-    # ダミーデータを事前生成
     print("ダミーデータを生成中...")
     dummy_observations = [generate_dummy_observation() for _ in range(NUM_REQUESTS)]
     print("生成完了\n")
 
-    # ベンチマーク実行
     print(f"{NUM_REQUESTS}件の推論リクエストを送信中...")
 
     success_count = 0
@@ -77,14 +66,12 @@ def benchmark():
             failure_count += 1
             print(f"リクエスト {i+1} でエラー: {e}")
 
-        # 進捗表示（100件ごと）
         if (i + 1) % 100 == 0:
             print(f"  {i + 1}/{NUM_REQUESTS} 完了...")
 
     end_time = time.time()
     total_time = end_time - start_time
 
-    # 結果表示
     print("\n" + "="*50)
     print("ベンチマーク結果")
     print("="*50)
