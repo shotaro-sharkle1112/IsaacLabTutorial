@@ -39,7 +39,7 @@ params:
     batch_size: 4096
     learnable_temperature: True
     num_warmup_steps: 10 # total number of warmup steps: num_actors * num_steps_per_episode * num_warmup_steps
-    replay_buffer_size: 70000
+    replay_buffer_size: 50000
     num_actors: 100
 
     env_config:
