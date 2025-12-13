@@ -7,7 +7,8 @@ import torch
 
 # ★ここを自分の実際のパスに変える
 CONFIG_PATH = "rl_games_sac_cfg2.yaml"
-CHECKPOINT_PATH = "limo-pendulum.pth"
+CHECKPOINT_PATH = "limo-pendulum_2025-12-13_10-28-27_7950epoch.pth"
+
 
 # ★ここを学習環境に合わせて設定
 OBS_DIM = 4   # 観測ベクトル次元
