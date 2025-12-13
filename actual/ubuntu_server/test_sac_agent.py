@@ -3,12 +3,13 @@ import numpy as np
 import gym
 from rl_games.torch_runner import Runner
 import torch
-
+import json
+import os
 
 # ★ここを自分の実際のパスに変える
 CONFIG_PATH = "rl_games_sac_cfg2.yaml"
 CHECKPOINT_PATH = "limo-pendulum_2025-12-13_10-28-27_7950epoch.pth"
-
+BUFFER_DATA_PATH = "extract.jsonl"
 
 # ★ここを学習環境に合わせて設定
 OBS_DIM = 4   # 観測ベクトル次元
@@ -48,9 +49,19 @@ agent.restore(CHECKPOINT_PATH)
 agent.init_tensors()
 agent.algo_observer.after_init(agent)
 
+with open(BUFFER_DATA_PATH, "r", encoding="utf-8") as fin:
+    for _, line in enumerate(fin, start=1):
+        line = line.strip()
+        if not line:
+            continue
+        rec = json.loads(line)
+        obs = rec.get("obs", [None])
+        
+        action = rec.get("action", [None])
+        reward = rec.get("reward", [None])
+        next_obs = rec.get("next_obs", [None])
+        agent.replay_buffer.add(torch.tensor([obs], device='cuda:0') ,torch.tensor([action], device='cuda:0'),torch.tensor([reward], device='cuda:0') ,torch.tensor([next_obs], device='cuda:0') ,torch.tensor([[False]], device='cuda:0'))
 
-for i in range(5000):
-    agent.replay_buffer.add(torch.tensor([[ 3.5487e-02,  0.0000e+00, -5.2387e-10,  0.0000e+00]], device='cuda:0') ,torch.tensor([[-0.3472]], device='cuda:0'),torch.tensor([[0.9801]], device='cuda:0') ,torch.tensor([[ 0.0183, -1.6309,  0.0336,  0.7934]], device='cuda:0') ,torch.tensor([[False]], device='cuda:0'))
 print(agent.replay_buffer.sample(1))
 print("------------------------")
 print(agent.replay_buffer.capacity)
@@ -73,6 +84,7 @@ print("actor trunk2 weight shape:", w.shape)
 print("actor trunk2 weight sample:\n", w[:3, :5])
 print("------------------------")
 
+agent.save(os.path.join(agent.nn_dir, agent.config["name"]))
 
 
 
