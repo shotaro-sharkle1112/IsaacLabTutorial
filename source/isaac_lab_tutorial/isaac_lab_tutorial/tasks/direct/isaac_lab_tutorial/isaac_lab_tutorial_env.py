@@ -414,6 +414,7 @@ def compute_rewards2(
     total_reward = rew_termination + rew_pole_pos + rew_cart_pos + rew_cart_vel + rew_pole_vel
     return total_reward
 
+from isaaclab.utils.timer import Timer
 
 class LimoPendulumNoNoiseEnv2RLGames(DirectRLEnv):
     cfg: LimoPendulumEnvCfg
@@ -421,6 +422,8 @@ class LimoPendulumNoNoiseEnv2RLGames(DirectRLEnv):
     def __init__(self, cfg: LimoPendulumEnvCfg, render_mode: str | None = None, **kwargs):
         super().__init__(cfg, render_mode, **kwargs)
 
+        self.timer = Timer()
+        self.timer.start()
         self._cart_dof_idxs, _ = self.limo.find_joints(self.cfg.cart_dof_names)
         self._pole_dof_idx, _ = self.limo.find_joints(self.cfg.pole_dof_name)
         self.action_scale = self.cfg.action_scale
@@ -487,6 +490,10 @@ class LimoPendulumNoNoiseEnv2RLGames(DirectRLEnv):
         # 現在の座標とenv_state.originsを引いてどれだけ座標がずれたかを調べる
         dists = torch.norm(self.limo.data.root_link_pos_w - (self.limo.data.default_root_state[:, :3]+self.scene.env_origins),dim=1)
         out_of_bounds = dists > self.cfg.max_cart_pos
+        # play.pyの評価用
+        out_of_bounds = out_of_bounds | torch.any(self.joint_pos[:, self._pole_dof_idx] > math.pi * 0.116, dim=1)
+        out_of_bounds = out_of_bounds | torch.any(self.joint_pos[:, self._pole_dof_idx] < -math.pi * 0.088, dim=1)
+        
         out_of_bounds = out_of_bounds | torch.any(torch.abs(self.joint_pos[:, self._pole_dof_idx]) > math.pi / 2.1, dim=1)
         world_up = torch.tensor([0.0, 0.0, 1.0], device=self.limo.device)
         quat = self.limo.data.root_link_quat_w
@@ -496,6 +503,8 @@ class LimoPendulumNoNoiseEnv2RLGames(DirectRLEnv):
         return out_of_bounds, time_out
 
     def _reset_idx(self, env_ids: Sequence[int] | None):
+        
+        print(self.timer.time_elapsed)
         if env_ids is None:
             env_ids = self.limo._ALL_INDICES
         super()._reset_idx(env_ids)
