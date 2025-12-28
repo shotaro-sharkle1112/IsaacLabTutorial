@@ -1,0 +1,50 @@
+params:
+  seed: 42
+  algo:
+    name: sac
+  model:
+    name: soft_actor_critic
+  network:
+    name: soft_actor_critic
+    separate: true
+    space:
+      continuous: null
+    mlp:
+      units:
+      - 512
+      - 256
+      activation: relu
+      initializer:
+        name: default
+    log_std_bounds:
+    - -5
+    - 2
+  config:
+    name: limo-pendulum
+    env_name: rlgpu
+    normalize_input: true
+    reward_shaper:
+      scale_value: 1
+    device: cuda
+    max_epochs: 9062
+    num_steps_per_episode: 16
+    save_best_after: 100
+    save_frequency: 10000
+    gamma: 0.99
+    init_alpha: 1
+    alpha_lr: 0.0001
+    actor_lr: 0.0001
+    critic_lr: 0.0001
+    critic_tau: 0.001
+    batch_size: 4096
+    learnable_temperature: true
+    num_warmup_steps: 10
+    replay_buffer_size: 50000
+    num_actors: 100
+    env_config:
+      env_name: ant
+    train_dir: C:\Users\xr\Issac\IssacLab\Projects\IsaacLabTutorial\logs\rl_games\limo-pendulum
+    full_experiment_name: 2025-12-13_10-28-27
+  env:
+    clip_actions: 1.0
+    clip_observations: 2.0
